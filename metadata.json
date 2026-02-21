@@ -1,0 +1,7 @@
+{
+  "name": "MediShare",
+  "description": "Medicine Donation & Waste Reduction Platform - A secure healthcare platform connecting unexpired surplus medicine with verified patients in need.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
