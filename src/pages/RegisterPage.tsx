@@ -55,6 +55,7 @@ export function RegisterPage() {
   const ngoForm = useForm({ resolver: zodResolver(ngoSchema) });
   const patientForm = useForm({ resolver: zodResolver(patientSchema) });
   const riderForm = useForm({ resolver: zodResolver(riderSchema) });
+  const adminForm = useForm({ resolver: zodResolver(z.object({ name: z.string().min(2) })) });
 
   if (!user) {
     navigate('/login');
@@ -166,13 +167,7 @@ export function RegisterPage() {
   };
 
   const onRiderSubmit = async (data: any) => {
-    console.log('Starting rider registration...', { uid: user.uid, data });
     setLoading(true);
-    const timeout = setTimeout(() => {
-      setLoading(false);
-      alert('Registration timed out.');
-    }, 15000);
-
     try {
       await dbService.createUserProfile(user.uid, {
         role: 'rider',
@@ -180,12 +175,26 @@ export function RegisterPage() {
         phone: user.phoneNumber || '',
         verified: true,
       });
-      console.log('Rider profile created successfully');
-      clearTimeout(timeout);
       navigate('/dashboard/rider');
     } catch (err: any) {
-      console.error('Rider registration error:', err);
-      clearTimeout(timeout);
+      alert('Registration failed: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onAdminSubmit = async (data: any) => {
+    setLoading(true);
+    try {
+      await dbService.createUserProfile(user.uid, {
+        role: 'admin',
+        name: data.name,
+        phone: user.phoneNumber || '',
+        verified: true,
+        status: 'approved',
+      });
+      navigate('/dashboard/admin');
+    } catch (err: any) {
       alert('Registration failed: ' + err.message);
     } finally {
       setLoading(false);
@@ -208,6 +217,7 @@ export function RegisterPage() {
               { id: 'ngo', label: 'NGO / Clinic', icon: HeartIcon, desc: 'Request medicines for patients' },
               { id: 'patient', label: 'Patient', icon: PackageIcon, desc: 'Request medicines with prescription' },
               { id: 'rider', label: 'Rider', icon: TruckIcon, desc: 'Help with medicine logistics' },
+              { id: 'admin', label: 'Admin', icon: ShieldCheckIcon, desc: 'Manage users and approvals' },
             ].map((item) => (
               <motion.button
                 key={item.id}
@@ -335,6 +345,35 @@ export function RegisterPage() {
                   </div>
                   <button disabled={loading} type="submit" className="w-full bg-primary text-white py-4 rounded-xl font-bold shadow-lg shadow-primary/20">
                     {loading ? 'Registering...' : 'Complete Registration'}
+                  </button>
+                </form>
+              )}
+              {role === 'rider' && (
+                <form onSubmit={riderForm.handleSubmit(onRiderSubmit)} className="space-y-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-slate-700">Full Name</label>
+                    <input {...riderForm.register('name')} className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-primary" placeholder="Your Name" />
+                    {riderForm.formState.errors.name && <p className="text-xs text-red-500">{riderForm.formState.errors.name.message as string}</p>}
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-slate-700">Vehicle Number</label>
+                    <input {...riderForm.register('vehicleNumber')} className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-primary" placeholder="e.g. MH 31 AB 1234" />
+                    {riderForm.formState.errors.vehicleNumber && <p className="text-xs text-red-500">{riderForm.formState.errors.vehicleNumber.message as string}</p>}
+                  </div>
+                  <button disabled={loading} type="submit" className="w-full bg-primary text-white py-4 rounded-xl font-bold shadow-lg shadow-primary/20">
+                    {loading ? 'Registering...' : 'Complete Registration'}
+                  </button>
+                </form>
+              )}
+
+              {role === 'admin' && (
+                <form onSubmit={adminForm.handleSubmit(onAdminSubmit)} className="space-y-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-slate-700">Admin Name</label>
+                    <input {...adminForm.register('name')} className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-primary" placeholder="System Admin" />
+                  </div>
+                  <button disabled={loading} type="submit" className="w-full bg-primary text-white py-4 rounded-xl font-bold shadow-lg shadow-primary/20">
+                    {loading ? 'Registering...' : 'Create Admin Account'}
                   </button>
                 </form>
               )}

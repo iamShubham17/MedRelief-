@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import mongoose from 'mongoose';
 import { createServer as createViteServer } from 'vite';
 import connectDB from './src/config/db.js';
 import { User, Donation, Request } from './src/models/models.js';
