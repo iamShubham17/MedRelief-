@@ -7,8 +7,8 @@ import {
   signInWithPopup,
   ConfirmationResult
 } from 'firebase/auth';
-import { auth, db } from '@/config/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { auth } from '@/config/firebase';
+import { dbService } from '@/services/dbService';
 import { motion } from 'motion/react';
 import { MedicalServices, ShieldCheckIcon } from '@/components/icons';
 
@@ -55,11 +55,10 @@ export function LoginPage() {
       const result = await confirmationResult.confirm(otp);
       const user = result.user;
       
-      // Check if user exists in Firestore
-      const userDoc = await getDoc(doc(db, 'users', user.uid));
-      if (userDoc.exists()) {
-        const role = userDoc.data().role;
-        navigate(`/dashboard/${role}`);
+      // Check if user exists in MongoDB
+      const userProfile = await dbService.getUserProfile(user.uid);
+      if (userProfile) {
+        navigate(`/dashboard/${userProfile.role}`);
       } else {
         navigate('/register');
       }
@@ -76,10 +75,9 @@ export function LoginPage() {
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
-      const userDoc = await getDoc(doc(db, 'users', user.uid));
-      if (userDoc.exists()) {
-        const role = userDoc.data().role;
-        navigate(`/dashboard/${role}`);
+      const userProfile = await dbService.getUserProfile(user.uid);
+      if (userProfile) {
+        navigate(`/dashboard/${userProfile.role}`);
       } else {
         navigate('/register');
       }

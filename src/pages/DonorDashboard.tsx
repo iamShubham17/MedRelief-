@@ -11,8 +11,6 @@ import {
   ClockIcon,
   XIcon
 } from '@/components/icons';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { storage } from '@/config/firebase';
 
 export function DonorDashboard() {
   const { user, profile } = useAuth();
@@ -44,21 +42,15 @@ export function DonorDashboard() {
     const medicineName = formData.get('medicineName') as string;
     const expiryDate = formData.get('expiryDate') as string;
     const quantity = formData.get('quantity') as string;
-    const photo = (formData.get('photo') as File);
-
-    if (!photo) return;
+    const imageUrl = formData.get('imageUrl') as string;
 
     setFormLoading(true);
     try {
-      const storageRef = ref(storage, `donations/${user!.uid}/${Date.now()}_${photo.name}`);
-      await uploadBytes(storageRef, photo);
-      const photoUrl = await getDownloadURL(storageRef);
-
       await dbService.createDonation(user!.uid, {
         medicineName,
         expiryDate,
         quantity,
-        photoUrl,
+        imageUrl: imageUrl || 'https://placeholder.com/medicine.jpg',
         donorName: profile?.name || 'Anonymous Donor',
       });
 
@@ -66,6 +58,7 @@ export function DonorDashboard() {
       loadDonations();
     } catch (err) {
       console.error(err);
+      alert('Failed to create donation');
     } finally {
       setFormLoading(false);
     }
@@ -134,7 +127,9 @@ export function DonorDashboard() {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-slate-500">{d.expiryDate}</td>
-                    <td className="px-6 py-4 text-slate-400">{d.createdAt?.toDate().toLocaleDateString()}</td>
+                    <td className="px-6 py-4 text-slate-400">
+                      {d.createdAt ? new Date(d.createdAt).toLocaleDateString() : 'N/A'}
+                    </td>
                   </tr>
                 ))}
                 {donations.length === 0 && !loading && (
@@ -179,8 +174,8 @@ export function DonorDashboard() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-700">Medicine Photo</label>
-                  <input name="photo" type="file" required accept="image/*" className="w-full px-4 py-3 border border-dashed border-slate-200 rounded-xl" />
+                  <label className="text-sm font-bold text-slate-700">Medicine Image URL</label>
+                  <input name="imageUrl" className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-primary" placeholder="https://example.com/image.jpg" />
                 </div>
                 <button disabled={formLoading} type="submit" className="w-full bg-primary text-white py-4 rounded-xl font-bold shadow-lg shadow-primary/20">
                   {formLoading ? 'Uploading...' : 'Submit Donation'}

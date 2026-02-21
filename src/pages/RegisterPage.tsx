@@ -15,8 +15,6 @@ import {
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { storage } from '@/config/firebase';
 
 const donorSchema = z.object({
   name: z.string().min(2, 'Name is required'),
@@ -51,7 +49,6 @@ export function RegisterPage() {
   const navigate = useNavigate();
   const [role, setRole] = useState<UserRole | null>(null);
   const [loading, setLoading] = useState(false);
-  const [file, setFile] = useState<File | null>(null);
 
   const donorForm = useForm({ resolver: zodResolver(donorSchema) });
   const pharmacistForm = useForm({ resolver: zodResolver(pharmacistSchema) });
@@ -98,39 +95,21 @@ export function RegisterPage() {
   };
 
   const onPharmacistSubmit = async (data: any) => {
-    if (!file) {
-      alert('Please upload your license certificate');
-      return;
-    }
-    console.log('Starting pharmacist registration...', { uid: user.uid, fileName: file.name });
+    console.log('Starting pharmacist registration...', { uid: user.uid });
     setLoading(true);
-    const timeout = setTimeout(() => {
-      setLoading(false);
-      alert('Upload timed out. Please check your internet connection or Firebase Storage bucket.');
-    }, 30000);
-
     try {
-      const storageRef = ref(storage, `licenses/${user.uid}/${file.name}`);
-      console.log('Uploading license file...');
-      await uploadBytes(storageRef, file);
-      console.log('File uploaded, getting download URL...');
-      const licenseUrl = await getDownloadURL(storageRef);
-      console.log('License URL obtained:', licenseUrl);
-
       await dbService.createUserProfile(user.uid, {
         role: 'pharmacist',
         ...data,
         phone: user.phoneNumber || '',
-        licenseUrl,
+        licenseUrl: 'https://placeholder.com/license.pdf', // Placeholder as storage is removed
         status: 'pending',
         verified: false,
       });
       console.log('Pharmacist profile created successfully');
-      clearTimeout(timeout);
       navigate('/dashboard/pharmacist');
     } catch (err: any) {
       console.error('Pharmacist registration error:', err);
-      clearTimeout(timeout);
       alert('Registration failed: ' + err.message);
     } finally {
       setLoading(false);
@@ -138,38 +117,21 @@ export function RegisterPage() {
   };
 
   const onNGOSubmit = async (data: any) => {
-    if (!file) {
-      alert('Please upload your registration certificate');
-      return;
-    }
-    console.log('Starting NGO registration...', { uid: user.uid, fileName: file.name });
+    console.log('Starting NGO registration...', { uid: user.uid });
     setLoading(true);
-    const timeout = setTimeout(() => {
-      setLoading(false);
-      alert('Upload timed out. Please check your internet connection or Firebase Storage bucket.');
-    }, 30000);
-
     try {
-      const storageRef = ref(storage, `ngo_certs/${user.uid}/${file.name}`);
-      console.log('Uploading NGO certificate...');
-      await uploadBytes(storageRef, file);
-      console.log('File uploaded, getting download URL...');
-      const certUrl = await getDownloadURL(storageRef);
-
       await dbService.createUserProfile(user.uid, {
         role: 'ngo',
         ...data,
         phone: user.phoneNumber || '',
-        certUrl,
+        certUrl: 'https://placeholder.com/cert.pdf', // Placeholder as storage is removed
         status: 'pending',
         verified: false,
       });
       console.log('NGO profile created successfully');
-      clearTimeout(timeout);
       navigate('/dashboard/ngo');
     } catch (err: any) {
       console.error('NGO registration error:', err);
-      clearTimeout(timeout);
       alert('Registration failed: ' + err.message);
     } finally {
       setLoading(false);
@@ -315,10 +277,6 @@ export function RegisterPage() {
                     <label className="text-sm font-bold text-slate-700">Pharmacy Address</label>
                     <textarea {...pharmacistForm.register('pharmacyAddress')} className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-primary" rows={3} />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-700">License Certificate (Upload)</label>
-                    <input type="file" onChange={(e) => setFile(e.target.files?.[0] || null)} className="w-full px-4 py-3 border border-dashed border-slate-200 rounded-xl" accept="image/*,application/pdf" />
-                  </div>
                   <button disabled={loading} type="submit" className="w-full bg-primary text-white py-4 rounded-xl font-bold shadow-lg shadow-primary/20">
                     {loading ? 'Uploading...' : 'Submit for Approval'}
                   </button>
@@ -338,10 +296,6 @@ export function RegisterPage() {
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-slate-700">Address</label>
                     <textarea {...ngoForm.register('address')} className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-primary" rows={3} />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-700">Registration Certificate (Upload)</label>
-                    <input type="file" onChange={(e) => setFile(e.target.files?.[0] || null)} className="w-full px-4 py-3 border border-dashed border-slate-200 rounded-xl" accept="image/*,application/pdf" />
                   </div>
                   <button disabled={loading} type="submit" className="w-full bg-primary text-white py-4 rounded-xl font-bold shadow-lg shadow-primary/20">
                     {loading ? 'Uploading...' : 'Submit for Approval'}

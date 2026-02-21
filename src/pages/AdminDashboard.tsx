@@ -40,6 +40,7 @@ export function AdminDashboard() {
       loadPending();
     } catch (err) {
       console.error(err);
+      alert('Failed to approve user');
     }
   };
 

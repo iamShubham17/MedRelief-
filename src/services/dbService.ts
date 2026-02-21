@@ -1,88 +1,72 @@
-import { 
-  collection, 
-  doc, 
-  setDoc, 
-  getDoc, 
-  updateDoc, 
-  serverTimestamp, 
-  addDoc,
-  query,
-  where,
-  getDocs,
-  orderBy
-} from 'firebase/firestore';
-import { db } from '@/config/firebase';
 import { UserRole } from '@/context/AuthContext';
 
+const API_URL = '/api';
+
 export const dbService = {
-  async createUserProfile(uid: string, data: any) {
-    console.log('dbService: Creating user profile...', { uid, role: data.role });
-    try {
-      await setDoc(doc(db, 'users', uid), {
-        ...data,
-        uid,
-        createdAt: serverTimestamp(),
-      });
-      console.log('dbService: User profile created successfully');
-    } catch (error) {
-      console.error('dbService: Error creating user profile:', error);
-      throw error;
-    }
+  async createUserProfile(firebaseUID: string, data: any) {
+    const response = await fetch(`${API_URL}/users`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ firebaseUID, ...data }),
+    });
+    if (!response.ok) throw new Error('Failed to create user profile');
+    return response.json();
   },
 
-  async getUserProfile(uid: string) {
-    const snap = await getDoc(doc(db, 'users', uid));
-    return snap.exists() ? snap.data() : null;
+  async getUserProfile(firebaseUID: string) {
+    const response = await fetch(`${API_URL}/users/${firebaseUID}`);
+    if (response.status === 404) return null;
+    if (!response.ok) throw new Error('Failed to fetch user profile');
+    return response.json();
   },
 
   async createDonation(donorId: string, data: any) {
-    return await addDoc(collection(db, 'donations'), {
-      ...data,
-      donorId,
-      status: 'pending_verification',
-      createdAt: serverTimestamp(),
+    const response = await fetch(`${API_URL}/donations`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ donorId, ...data }),
     });
+    if (!response.ok) throw new Error('Failed to create donation');
+    return response.json();
   },
 
   async getDonationsByDonor(donorId: string) {
-    const q = query(collection(db, 'donations'), where('donorId', '==', donorId), orderBy('createdAt', 'desc'));
-    const snap = await getDocs(q);
-    return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const response = await fetch(`${API_URL}/donations?donorId=${donorId}`);
+    if (!response.ok) throw new Error('Failed to fetch donations');
+    const data = await response.json();
+    return data.map((d: any) => ({ ...d, id: d._id }));
   },
 
   async getVerificationQueue() {
-    const q = query(collection(db, 'donations'), where('status', '==', 'pending_verification'), orderBy('createdAt', 'asc'));
-    const snap = await getDocs(q);
-    return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const response = await fetch(`${API_URL}/donations/queue`);
+    if (!response.ok) throw new Error('Failed to fetch verification queue');
+    const data = await response.json();
+    return data.map((d: any) => ({ ...d, id: d._id }));
   },
 
   async verifyDonation(donationId: string, pharmacistId: string, decision: 'approved' | 'rejected', notes: string) {
-    const donationRef = doc(db, 'donations', donationId);
-    await updateDoc(donationRef, {
-      status: decision === 'approved' ? 'verified' : 'rejected',
-      verifiedAt: serverTimestamp(),
-      verifiedBy: pharmacistId,
+    const response = await fetch(`${API_URL}/donations/${donationId}/verify`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ decision, notes, pharmacistId }),
     });
-
-    await addDoc(collection(db, 'verifications'), {
-      donationId,
-      pharmacistId,
-      decision,
-      notes,
-      createdAt: serverTimestamp(),
-    });
+    if (!response.ok) throw new Error('Failed to verify donation');
+    const data = await response.json();
+    return { ...data, id: data._id };
   },
 
   async getPendingApprovals(role: UserRole) {
-    const q = query(collection(db, 'users'), where('role', '==', role), where('status', '==', 'pending'));
-    const snap = await getDocs(q);
-    return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const response = await fetch(`${API_URL}/admin/pending/${role}`);
+    if (!response.ok) throw new Error('Failed to fetch pending approvals');
+    const data = await response.json();
+    return data.map((u: any) => ({ ...u, id: u.firebaseUID })); // Use firebaseUID as id for admin dashboard
   },
 
   async approveUser(uid: string) {
-    await updateDoc(doc(db, 'users', uid), {
-      status: 'approved',
-      verified: true,
+    const response = await fetch(`${API_URL}/admin/approve/${uid}`, {
+      method: 'PATCH',
     });
+    if (!response.ok) throw new Error('Failed to approve user');
+    return response.json();
   }
 };

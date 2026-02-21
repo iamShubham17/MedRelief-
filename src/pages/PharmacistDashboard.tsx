@@ -94,7 +94,7 @@ export function PharmacistDashboard() {
                 >
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-lg overflow-hidden bg-slate-100">
-                      <img src={item.photoUrl} alt={item.medicineName} className="w-full h-full object-cover" />
+                      <img src={item.imageUrl} alt={item.medicineName} className="w-full h-full object-cover" />
                     </div>
                     <div>
                       <p className="text-sm font-bold text-slate-900">{item.medicineName}</p>
@@ -122,7 +122,7 @@ export function PharmacistDashboard() {
                 className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-6"
               >
                 <div className="aspect-video rounded-xl overflow-hidden bg-slate-100 mb-4">
-                  <img src={selectedDonation.photoUrl} alt="Medicine" className="w-full h-full object-contain" />
+                  <img src={selectedDonation.imageUrl} alt="Medicine" className="w-full h-full object-contain" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Pharmacist Notes</label>
