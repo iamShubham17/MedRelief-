@@ -348,23 +348,6 @@ export function RegisterPage() {
                   </button>
                 </form>
               )}
-              {role === 'rider' && (
-                <form onSubmit={riderForm.handleSubmit(onRiderSubmit)} className="space-y-6">
-                  <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-700">Full Name</label>
-                    <input {...riderForm.register('name')} className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-primary" placeholder="Your Name" />
-                    {riderForm.formState.errors.name && <p className="text-xs text-red-500">{riderForm.formState.errors.name.message as string}</p>}
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-700">Vehicle Number</label>
-                    <input {...riderForm.register('vehicleNumber')} className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-primary" placeholder="e.g. MH 31 AB 1234" />
-                    {riderForm.formState.errors.vehicleNumber && <p className="text-xs text-red-500">{riderForm.formState.errors.vehicleNumber.message as string}</p>}
-                  </div>
-                  <button disabled={loading} type="submit" className="w-full bg-primary text-white py-4 rounded-xl font-bold shadow-lg shadow-primary/20">
-                    {loading ? 'Registering...' : 'Complete Registration'}
-                  </button>
-                </form>
-              )}
 
               {role === 'admin' && (
                 <form onSubmit={adminForm.handleSubmit(onAdminSubmit)} className="space-y-6">
