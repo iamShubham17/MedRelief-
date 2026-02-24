@@ -74,9 +74,9 @@ export default function App() {
           } />
 
           {/* Sub-routes */}
-          <Route path="/dashboard/:role/history" element={<ProtectedRoute><PlaceholderPage role="donor" title="History" /></ProtectedRoute>} />
-          <Route path="/dashboard/:role/profile" element={<ProtectedRoute><PlaceholderPage role="donor" title="Profile" /></ProtectedRoute>} />
-          <Route path="/dashboard/:role/settings" element={<ProtectedRoute><PlaceholderPage role="donor" title="Settings" /></ProtectedRoute>} />
+          <Route path="/dashboard/:role/history" element={<ProtectedRoute><PlaceholderPage title="History" /></ProtectedRoute>} />
+          <Route path="/dashboard/:role/profile" element={<ProtectedRoute><PlaceholderPage title="Profile" /></ProtectedRoute>} />
+          <Route path="/dashboard/:role/settings" element={<ProtectedRoute><PlaceholderPage title="Settings" /></ProtectedRoute>} />
         </Routes>
       </Router>
     </AuthProvider>

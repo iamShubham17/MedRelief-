@@ -9,10 +9,12 @@ import {
 } from 'firebase/auth';
 import { auth } from '@/config/firebase';
 import { dbService } from '@/services/dbService';
+import { useAuth } from '@/context/AuthContext';
 import { motion } from 'motion/react';
 import { MedicalServices, ShieldCheckIcon } from '@/components/icons';
 
 export function LoginPage() {
+  const { refreshProfile } = useAuth();
   const [phoneNumber, setPhoneNumber] = useState('');
   const [otp, setOtp] = useState('');
   const [step, setStep] = useState<'phone' | 'otp'>('phone');
@@ -58,6 +60,7 @@ export function LoginPage() {
       // Check if user exists in MongoDB
       const userProfile = await dbService.getUserProfile(user.uid);
       if (userProfile) {
+        await refreshProfile();
         navigate(`/dashboard/${userProfile.role}`);
       } else {
         navigate('/register');
@@ -77,6 +80,7 @@ export function LoginPage() {
       const user = result.user;
       const userProfile = await dbService.getUserProfile(user.uid);
       if (userProfile) {
+        await refreshProfile();
         navigate(`/dashboard/${userProfile.role}`);
       } else {
         navigate('/register');
@@ -97,7 +101,7 @@ export function LoginPage() {
             <div className="text-primary">
               <MedicalServices className="w-8 h-8" />
             </div>
-            <h1 className="text-xl font-bold tracking-tight text-slate-900">MedRelief<span className="text-primary">+</span></h1>
+            <h1 className="text-xl font-bold tracking-tight text-slate-900">MediShare<span className="text-primary">+</span></h1>
           </div>
         </div>
       </header>

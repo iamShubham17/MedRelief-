@@ -42,7 +42,7 @@ export function DashboardLayout({ children, role, userName }: DashboardLayoutPro
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-slate-200 flex flex-col sticky top-0 h-screen">
         <div className="p-6 border-b border-slate-100">
-          <Link to="/">
+          <Link to={`/dashboard/${role}`}>
             <Logo size="sm" />
           </Link>
         </div>

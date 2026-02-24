@@ -47,7 +47,7 @@ const riderSchema = z.object({
 });
 
 export function RegisterPage() {
-  const { user } = useAuth();
+  const { user, refreshProfile } = useAuth();
   const navigate = useNavigate();
   const [role, setRole] = useState<UserRole | null>(null);
   const [loading, setLoading] = useState(false);
@@ -87,6 +87,7 @@ export function RegisterPage() {
         mediPoints: 0,
       });
       console.log('Donor profile created successfully');
+      await refreshProfile();
       clearTimeout(timeout);
       navigate('/dashboard/donor');
     } catch (err: any) {
@@ -111,6 +112,7 @@ export function RegisterPage() {
         verified: false,
       });
       console.log('Pharmacist profile created successfully');
+      await refreshProfile();
       navigate('/dashboard/pharmacist');
     } catch (err: any) {
       console.error('Pharmacist registration error:', err);
@@ -133,6 +135,7 @@ export function RegisterPage() {
         verified: false,
       });
       console.log('NGO profile created successfully');
+      await refreshProfile();
       navigate('/dashboard/ngo');
     } catch (err: any) {
       console.error('NGO registration error:', err);
@@ -158,6 +161,7 @@ export function RegisterPage() {
         verified: true,
       });
       console.log('Patient profile created successfully');
+      await refreshProfile();
       clearTimeout(timeout);
       navigate('/dashboard/patient');
     } catch (err: any) {
@@ -178,6 +182,7 @@ export function RegisterPage() {
         phone: user.phoneNumber || '',
         verified: true,
       });
+      await refreshProfile();
       setLoading(false);
       setShowRiderAnimation(true);
       setTimeout(() => {
@@ -199,6 +204,7 @@ export function RegisterPage() {
         verified: true,
         status: 'approved',
       });
+      await refreshProfile();
       navigate('/dashboard/admin');
     } catch (err: any) {
       alert('Registration failed: ' + err.message);

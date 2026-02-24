@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/DashboardLayout';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
+import Lottie from 'lottie-react';
+import splashAnimation from '@/assets/animations/delivery-boy.json';
+import { useAuth } from '@/context/AuthContext';
 import { 
   TruckIcon, 
   MapPinIcon, 
@@ -10,6 +13,14 @@ import {
 } from '@/components/icons';
 
 export function RiderDashboard() {
+  const { profile } = useAuth();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
   const stats = [
     { label: 'Deliveries Done', value: '156', icon: TruckIcon, color: 'text-primary', bg: 'bg-primary/10' },
     { label: 'Active Tasks', value: '2', icon: ActivityIcon, color: 'text-blue-500', bg: 'bg-blue-500/10' },
@@ -21,8 +32,27 @@ export function RiderDashboard() {
     { id: '2', type: 'Delivery', location: 'Red Cross Center', time: 'By 4:00 PM', status: 'Scheduled' },
   ];
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6">
+        <div className="w-80 h-80">
+          <Lottie animationData={splashAnimation} loop={true} />
+        </div>
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="text-center mt-8"
+        >
+          <h2 className="text-3xl font-black text-slate-900 mb-2">Loading Dashboard</h2>
+          <p className="text-slate-500 font-medium uppercase tracking-widest text-xs">Preparing your route...</p>
+        </motion.div>
+      </div>
+    );
+  }
+
   return (
-    <DashboardLayout role="rider" userName="Vikram Singh">
+    <DashboardLayout role="rider" userName={profile?.name || 'Rider'}>
       <div className="space-y-8">
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
