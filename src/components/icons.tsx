@@ -9,6 +9,7 @@ import {
   Globe, 
   Share2, 
   Mail,
+  Phone,
   HeartHandshake,
   Stethoscope as MedicalServices,
   LayoutDashboard,
@@ -26,13 +27,15 @@ import {
   AlertCircle,
   ArrowLeft,
   X,
-  Construction
+  Construction,
+  CheckCircle
 } from 'lucide-react';
 
 export const MedicalServicesIcon = MedicalServices;
 export const Public = Globe;
 export const Share2Icon = Share2;
 export const MailIcon = Mail;
+export const PhoneIcon = Phone;
 export const HeartIcon = Heart;
 export const ShieldCheckIcon = ShieldCheck;
 export const PackageIcon = Package;
@@ -55,12 +58,14 @@ export const AlertCircleIcon = AlertCircle;
 export const ArrowLeftIcon = ArrowLeft;
 export const XIcon = X;
 export const ConstructionIcon = Construction;
+export const CheckCircleIcon = CheckCircle;
 
 export {
   MedicalServices,
   Globe,
   Share2,
   Mail,
+  Phone,
   Heart,
   ShieldCheck,
   Package,
@@ -82,5 +87,6 @@ export {
   AlertCircle,
   ArrowLeft,
   X,
-  Construction
+  Construction,
+  CheckCircle
 };

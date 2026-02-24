@@ -9,6 +9,9 @@ import { DonatePage } from './pages/DonatePage';
 import { DonorDashboard } from './pages/DonorDashboard';
 import { PharmacistDashboard } from './pages/PharmacistDashboard';
 import { RiderDashboard } from './pages/RiderDashboard';
+import { RiderHistory } from './pages/rider/RiderHistory';
+import { RiderProfile } from './pages/rider/RiderProfile';
+import { RiderSettings } from './pages/rider/RiderSettings';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 import { SplashScreen } from './components/SplashScreen';
@@ -74,6 +77,10 @@ export default function App() {
           } />
 
           {/* Sub-routes */}
+          <Route path="/dashboard/rider/history" element={<ProtectedRoute allowedRoles={['rider']}><RiderHistory /></ProtectedRoute>} />
+          <Route path="/dashboard/rider/profile" element={<ProtectedRoute allowedRoles={['rider']}><RiderProfile /></ProtectedRoute>} />
+          <Route path="/dashboard/rider/settings" element={<ProtectedRoute allowedRoles={['rider']}><RiderSettings /></ProtectedRoute>} />
+
           <Route path="/dashboard/:role/history" element={<ProtectedRoute><PlaceholderPage title="History" /></ProtectedRoute>} />
           <Route path="/dashboard/:role/profile" element={<ProtectedRoute><PlaceholderPage title="Profile" /></ProtectedRoute>} />
           <Route path="/dashboard/:role/settings" element={<ProtectedRoute><PlaceholderPage title="Settings" /></ProtectedRoute>} />
