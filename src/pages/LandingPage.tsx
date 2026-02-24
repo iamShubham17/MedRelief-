@@ -58,15 +58,18 @@ export function LandingPage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="relative"
             >
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl">
-                <img 
-                  src="https://picsum.photos/seed/medicine/800/1000" 
-                  alt="Medicine redistribution" 
-                  className="aspect-[4/5] object-cover"
-                  referrerPolicy="no-referrer"
-                />
-                <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent"></div>
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl">
+            <video
+              src="/videos/bs.mp4"
+               autoPlay
+                loop
+                 muted
+                   playsInline
+                     className="aspect-[4/5] object-cover w-full h-full"
+             />
+               <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent"></div>
               </div>
+
 
               {/* Floating Impact Card */}
               <motion.div 

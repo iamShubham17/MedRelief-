@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
-  MedicalServices, 
   DashboardIcon, 
   HistoryIcon, 
   UserIcon, 
@@ -13,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { useAuth, UserRole } from '@/context/AuthContext';
 import { auth } from '@/config/firebase';
 import { signOut } from 'firebase/auth';
+import { Logo } from '@/components/Logo';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -42,11 +42,8 @@ export function DashboardLayout({ children, role, userName }: DashboardLayoutPro
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-slate-200 flex flex-col sticky top-0 h-screen">
         <div className="p-6 border-b border-slate-100">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="bg-primary p-1.5 rounded-lg text-white">
-              <MedicalServices className="w-5 h-5" />
-            </div>
-            <span className="text-xl font-black tracking-tight text-primary">MedRelief+</span>
+          <Link to="/">
+            <Logo size="sm" />
           </Link>
         </div>
 

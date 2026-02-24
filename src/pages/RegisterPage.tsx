@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth, UserRole } from '@/context/AuthContext';
 import { dbService } from '@/services/dbService';
 import { motion, AnimatePresence } from 'motion/react';
+import Lottie from 'lottie-react';
+import splashAnimation from '@/assets/animations/splash-animation.json';
 import { 
   VolunteerActivism, 
   MedicalServices, 
@@ -49,6 +51,7 @@ export function RegisterPage() {
   const navigate = useNavigate();
   const [role, setRole] = useState<UserRole | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showRiderAnimation, setShowRiderAnimation] = useState(false);
 
   const donorForm = useForm({ resolver: zodResolver(donorSchema) });
   const pharmacistForm = useForm({ resolver: zodResolver(pharmacistSchema) });
@@ -175,11 +178,14 @@ export function RegisterPage() {
         phone: user.phoneNumber || '',
         verified: true,
       });
-      navigate('/dashboard/rider');
-    } catch (err: any) {
-      alert('Registration failed: ' + err.message);
-    } finally {
       setLoading(false);
+      setShowRiderAnimation(true);
+      setTimeout(() => {
+        navigate('/dashboard/rider');
+      }, 3500); // Show animation for 3.5 seconds
+    } catch (err: any) {
+      setLoading(false);
+      alert('Registration failed: ' + err.message);
     }
   };
 
@@ -203,6 +209,30 @@ export function RegisterPage() {
 
   return (
     <div className="min-h-screen bg-bg-light py-20 px-6">
+      <AnimatePresence>
+        {showRiderAnimation && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-white z-[200] flex flex-col items-center justify-center p-6"
+          >
+            <div className="w-80 h-80">
+              <Lottie animationData={splashAnimation} loop={true} />
+            </div>
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="text-center mt-8"
+            >
+              <h2 className="text-3xl font-black text-slate-900 mb-2">Setting Up Your Route!</h2>
+              <p className="text-slate-500 font-medium">Preparing your rider dashboard...</p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-3xl font-black text-slate-900 mb-2">Complete Your Profile</h1>

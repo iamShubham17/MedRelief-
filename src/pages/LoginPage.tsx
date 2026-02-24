@@ -97,7 +97,7 @@ export function LoginPage() {
             <div className="text-primary">
               <MedicalServices className="w-8 h-8" />
             </div>
-            <h1 className="text-xl font-bold tracking-tight text-slate-900">MediShare<span className="text-primary">+</span></h1>
+            <h1 className="text-xl font-bold tracking-tight text-slate-900">MedRelief<span className="text-primary">+</span></h1>
           </div>
         </div>
       </header>

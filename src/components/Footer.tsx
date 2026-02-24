@@ -1,5 +1,6 @@
 import React from 'react';
-import { MedicalServices, Public, Share2, Mail } from '@/components/icons';
+import { Public, Share2, Mail } from '@/components/icons';
+import { Logo } from '@/components/Logo';
 
 export function Footer() {
   return (
@@ -7,12 +8,7 @@ export function Footer() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
           <div className="col-span-1 lg:col-span-1">
-            <div className="flex items-center gap-2 mb-6">
-              <div className="bg-primary p-1 rounded-lg text-white">
-                <MedicalServices className="w-5 h-5" />
-              </div>
-              <span className="text-xl font-black tracking-tight text-primary">MedRelief<span className="text-slate-900">+</span></span>
-            </div>
+            <Logo className="mb-6" />
             <p className="text-slate-500 leading-relaxed mb-6">
               Building a zero-waste healthcare future by connecting surplus supplies to critical needs.
             </p>
