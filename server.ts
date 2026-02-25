@@ -109,6 +109,36 @@ async function startServer() {
     }
   });
 
+  // NGO Routes
+  app.get('/api/donations/available', async (req, res) => {
+    try {
+      const donations = await Donation.find({ status: 'verified' }).sort({ createdAt: -1 });
+      res.json(donations);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post('/api/requests', async (req, res) => {
+    try {
+      const request = await Request.create(req.body);
+      res.status(201).json(request);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  app.get('/api/requests', async (req, res) => {
+    try {
+      const { userId } = req.query;
+      const filter = userId ? { userId } : {};
+      const requests = await Request.find(filter).populate('medicineId').sort({ createdAt: -1 });
+      res.json(requests);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({

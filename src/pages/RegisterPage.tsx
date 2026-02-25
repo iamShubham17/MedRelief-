@@ -4,7 +4,7 @@ import { useAuth, UserRole } from '@/context/AuthContext';
 import { dbService } from '@/services/dbService';
 import { motion, AnimatePresence } from 'motion/react';
 import Lottie from 'lottie-react';
-import splashAnimation from '@/assets/animations/splash-animation.json';
+import splashAnimation from '@/assets/animations/register.json';
 import { 
   VolunteerActivism, 
   MedicalServices, 
@@ -215,6 +215,23 @@ export function RegisterPage() {
 
   return (
     <div className="min-h-screen bg-bg-light py-20 px-6">
+      <header className="w-full bg-white border-b border-slate-200 px-6 py-4 fixed top-0 z-50">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="text-primary">
+              <MedicalServices className="w-8 h-8" />
+            </div>
+            <h1 className="text-xl font-bold tracking-tight text-slate-900">MedRelief<span className="text-primary">+</span></h1>
+          </div>
+          <button 
+            onClick={() => navigate('/login')}
+            className="px-6 py-2 bg-slate-50 text-slate-900 rounded-xl font-bold text-sm border border-slate-200 hover:bg-slate-100 transition-all"
+          >
+            Login
+          </button>
+        </div>
+      </header>
+
       <AnimatePresence>
         {showRiderAnimation && (
           <motion.div 

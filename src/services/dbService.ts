@@ -68,5 +68,29 @@ export const dbService = {
     });
     if (!response.ok) throw new Error('Failed to approve user');
     return response.json();
+  },
+
+  async getAvailableMedicines() {
+    const response = await fetch(`${API_URL}/donations/available`);
+    if (!response.ok) throw new Error('Failed to fetch available medicines');
+    const data = await response.json();
+    return data.map((d: any) => ({ ...d, id: d._id }));
+  },
+
+  async requestMedicine(userId: string, medicineId: string) {
+    const response = await fetch(`${API_URL}/requests`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, medicineId }),
+    });
+    if (!response.ok) throw new Error('Failed to request medicine');
+    return response.json();
+  },
+
+  async getUserRequests(userId: string) {
+    const response = await fetch(`${API_URL}/requests?userId=${userId}`);
+    if (!response.ok) throw new Error('Failed to fetch user requests');
+    const data = await response.json();
+    return data.map((r: any) => ({ ...r, id: r._id }));
   }
 };

@@ -11,6 +11,8 @@ import { auth } from '@/config/firebase';
 import { dbService } from '@/services/dbService';
 import { useAuth } from '@/context/AuthContext';
 import { motion } from 'motion/react';
+import Lottie from 'lottie-react';
+import splashAnimation from '@/assets/animations/Appointment booking with smartphone.json';
 import { MedicalServices, ShieldCheckIcon } from '@/components/icons';
 
 export function LoginPage() {
@@ -101,105 +103,135 @@ export function LoginPage() {
             <div className="text-primary">
               <MedicalServices className="w-8 h-8" />
             </div>
-            <h1 className="text-xl font-bold tracking-tight text-slate-900">MediShare<span className="text-primary">+</span></h1>
+            <h1 className="text-xl font-bold tracking-tight text-slate-900">MedRelief<span className="text-primary">+</span></h1>
           </div>
+          <button 
+            onClick={() => navigate('/register')}
+            className="px-6 py-2 bg-slate-50 text-slate-900 rounded-xl font-bold text-sm border border-slate-200 hover:bg-slate-100 transition-all"
+          >
+            Register
+          </button>
         </div>
       </header>
 
       <main className="flex-grow flex items-center justify-center pt-24 pb-12 px-4">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-md"
-        >
-          <div className="bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden">
-            <div className="p-8">
-              <h2 className="text-2xl font-bold text-center mb-2">Welcome back</h2>
-              <p className="text-slate-500 text-center text-sm mb-8">Login to your secure healthcare dashboard</p>
+        <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Left Side: Animation */}
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="hidden lg:flex flex-col items-center justify-center text-center space-y-8"
+          >
+            <div className="w-full max-w-md">
+              <Lottie animationData={splashAnimation} loop={true} />
+            </div>
+            <div>
+              <h2 className="text-4xl font-black text-slate-900 mb-4 tracking-tight">Your Health, <span className="text-primary">Our Mission</span></h2>
+              <p className="text-slate-500 font-medium max-w-sm mx-auto text-lg">
+                Join our community of donors and healthcare professionals to make medicine accessible for everyone.
+              </p>
+            </div>
+          </motion.div>
 
-              {error && (
-                <div className="mb-6 p-3 bg-red-50 border border-red-100 text-red-600 text-sm rounded-lg text-center">
-                  {error}
-                </div>
-              )}
+          {/* Right Side: Login Form */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="w-full max-w-md mx-auto"
+          >
+            <div className="bg-white rounded-3xl shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
+              <div className="p-10">
+                <h2 className="text-3xl font-black text-slate-900 mb-2">Welcome back</h2>
+                <p className="text-slate-500 font-medium text-sm mb-10">Login to your secure healthcare dashboard</p>
 
-              {step === 'phone' ? (
-                <div className="space-y-6">
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Mobile Number</label>
-                    <div className="flex items-center border border-slate-200 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary transition-all">
-                      <div className="flex items-center gap-2 px-3 py-3 bg-slate-50 border-r border-slate-200">
-                        <span className="text-sm font-medium text-slate-700">+91</span>
+                {error && (
+                  <div className="mb-6 p-4 bg-red-50 border border-red-100 text-red-600 text-sm rounded-2xl font-bold text-center">
+                    {error}
+                  </div>
+                )}
+
+                {step === 'phone' ? (
+                  <div className="space-y-8">
+                    <div className="space-y-3">
+                      <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Mobile Number</label>
+                      <div className="flex items-center border border-slate-200 rounded-2xl overflow-hidden focus-within:ring-4 focus-within:ring-primary/10 focus-within:border-primary transition-all">
+                        <div className="flex items-center gap-2 px-4 py-4 bg-slate-50 border-r border-slate-200">
+                          <span className="text-sm font-bold text-slate-700">+91</span>
+                        </div>
+                        <input 
+                          className="flex-1 px-5 py-4 bg-transparent border-none focus:ring-0 text-slate-900 font-bold placeholder:text-slate-300" 
+                          maxLength={10} 
+                          placeholder="Enter 10-digit number" 
+                          type="tel"
+                          value={phoneNumber}
+                          onChange={(e) => setPhoneNumber(e.target.value)}
+                        />
                       </div>
+                    </div>
+                    <button 
+                      disabled={loading || phoneNumber.length !== 10}
+                      onClick={handleSendOtp}
+                      className="w-full bg-primary text-white py-4.5 rounded-2xl font-black text-sm shadow-xl shadow-primary/25 hover:bg-primary/90 active:scale-[0.98] transition-all disabled:opacity-50"
+                    >
+                      {loading ? 'Sending...' : 'Get OTP'}
+                    </button>
+                    
+                    <div className="relative py-4">
+                      <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-slate-100"></span></div>
+                      <div className="relative flex justify-center text-[10px] font-black uppercase tracking-widest"><span className="bg-white px-4 text-slate-400">Or continue with</span></div>
+                    </div>
+
+                    <button 
+                      onClick={handleGoogleSignIn}
+                      className="w-full flex items-center justify-center gap-3 border border-slate-200 py-4.5 rounded-2xl font-bold text-sm hover:bg-slate-50 transition-all"
+                    >
+                      <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" />
+                      Google Account
+                    </button>
+
+                    <p className="text-center text-xs font-bold text-slate-400 uppercase tracking-widest mt-4">
+                      New to MediShare+? <button onClick={() => navigate('/register')} className="text-primary hover:underline">Create an account</button>
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-8">
+                    <div className="space-y-3">
+                      <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Enter OTP</label>
                       <input 
-                        className="flex-1 px-4 py-3 bg-transparent border-none focus:ring-0 text-slate-900 placeholder:text-slate-400" 
-                        maxLength={10} 
-                        placeholder="Enter 10-digit number" 
-                        type="tel"
-                        value={phoneNumber}
-                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        className="w-full px-5 py-4 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-center tracking-[0.5em] text-2xl font-black text-slate-900 placeholder:text-slate-200" 
+                        maxLength={6} 
+                        placeholder="000000" 
+                        type="text"
+                        value={otp}
+                        onChange={(e) => setOtp(e.target.value)}
                       />
                     </div>
+                    <button 
+                      disabled={loading || otp.length !== 6}
+                      onClick={handleVerifyOtp}
+                      className="w-full bg-primary text-white py-4.5 rounded-2xl font-black text-sm shadow-xl shadow-primary/25 hover:bg-primary/90 active:scale-[0.98] transition-all disabled:opacity-50"
+                    >
+                      {loading ? 'Verifying...' : 'Verify & Login'}
+                    </button>
+                    <button 
+                      onClick={() => setStep('phone')}
+                      className="w-full text-xs font-black uppercase tracking-widest text-slate-400 hover:text-primary transition-colors"
+                    >
+                      Change Phone Number
+                    </button>
                   </div>
-                  <button 
-                    disabled={loading || phoneNumber.length !== 10}
-                    onClick={handleSendOtp}
-                    className="w-full bg-primary text-white py-3.5 rounded-lg font-bold text-sm shadow-lg shadow-primary/25 hover:bg-primary/90 active:scale-[0.98] transition-all disabled:opacity-50"
-                  >
-                    {loading ? 'Sending...' : 'Get OTP'}
-                  </button>
-                  
-                  <div className="relative">
-                    <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-slate-100"></span></div>
-                    <div className="relative flex justify-center text-xs uppercase"><span className="bg-white px-2 text-slate-400">Or continue with</span></div>
-                  </div>
-
-                  <button 
-                    onClick={handleGoogleSignIn}
-                    className="w-full flex items-center justify-center gap-3 border border-slate-200 py-3.5 rounded-lg font-semibold text-sm hover:bg-slate-50 transition-all"
-                  >
-                    <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" />
-                    Google Account
-                  </button>
-                </div>
-              ) : (
-                <div className="space-y-6">
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Enter OTP</label>
-                    <input 
-                      className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-center tracking-[1em] text-lg font-bold" 
-                      maxLength={6} 
-                      placeholder="000000" 
-                      type="text"
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value)}
-                    />
-                  </div>
-                  <button 
-                    disabled={loading || otp.length !== 6}
-                    onClick={handleVerifyOtp}
-                    className="w-full bg-primary text-white py-3.5 rounded-lg font-bold text-sm shadow-lg shadow-primary/25 hover:bg-primary/90 active:scale-[0.98] transition-all disabled:opacity-50"
-                  >
-                    {loading ? 'Verifying...' : 'Verify & Login'}
-                  </button>
-                  <button 
-                    onClick={() => setStep('phone')}
-                    className="w-full text-sm font-bold text-slate-500 hover:text-primary transition-colors"
-                  >
-                    Change Phone Number
-                  </button>
-                </div>
-              )}
+                )}
+              </div>
             </div>
-          </div>
 
-          <div className="mt-8 flex items-center justify-center gap-8 opacity-60">
-            <div className="flex items-center gap-1.5">
-              <ShieldCheckIcon className="w-4 h-4" />
-              <span className="text-[10px] font-bold uppercase tracking-wider">Secured by Firebase</span>
+            <div className="mt-10 flex items-center justify-center gap-8 opacity-40">
+              <div className="flex items-center gap-2">
+                <ShieldCheckIcon className="w-4 h-4" />
+                <span className="text-[10px] font-black uppercase tracking-widest">Secured by Firebase</span>
+              </div>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
       </main>
     </div>
   );
