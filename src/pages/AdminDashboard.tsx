@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { dbService } from '@/services/dbService';
 import { DashboardLayout } from '@/components/DashboardLayout';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
+import Lottie from 'lottie-react';
+import splashAnimation from '@/assets/animations/atom-loader.json';
 import { 
   ShieldCheckIcon, 
   UserIcon, 
@@ -16,9 +18,12 @@ export function AdminDashboard() {
   const [pendingPharmacists, setPendingPharmacists] = useState<any[]>([]);
   const [pendingNGOs, setPendingNGOs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
     loadPending();
+    const timer = setTimeout(() => setShowSplash(false), 2000);
+    return () => clearTimeout(timer);
   }, []);
 
   const loadPending = async () => {
@@ -44,8 +49,27 @@ export function AdminDashboard() {
     }
   };
 
+  if (showSplash) {
+    return (
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6">
+        <div className="w-80 h-80">
+          <Lottie animationData={splashAnimation} loop={true} />
+        </div>
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="text-center mt-8"
+        >
+          <h2 className="text-3xl font-black text-slate-900 mb-2">Admin Console</h2>
+          <p className="text-slate-500 font-medium uppercase tracking-widest text-xs">Securing system access...</p>
+        </motion.div>
+      </div>
+    );
+  }
+
   return (
-    <DashboardLayout role="admin" userName="System Admin">
+    <DashboardLayout role="admin" userName={profile?.name || 'System Admin'}>
       <div className="space-y-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">

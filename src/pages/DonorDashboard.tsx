@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { dbService } from '@/services/dbService';
 import { DashboardLayout } from '@/components/DashboardLayout';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
+import Lottie from 'lottie-react';
+import splashAnimation from '@/assets/animations/loading.json';
 import { 
   PlusCircleIcon, 
   PackageIcon, 
@@ -16,6 +18,7 @@ export function DonorDashboard() {
   const { user, profile } = useAuth();
   const [donations, setDonations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showSplash, setShowSplash] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
 
@@ -23,6 +26,8 @@ export function DonorDashboard() {
     if (user) {
       loadDonations();
     }
+    const timer = setTimeout(() => setShowSplash(false), 2000);
+    return () => clearTimeout(timer);
   }, [user]);
 
   const loadDonations = async () => {
@@ -63,6 +68,25 @@ export function DonorDashboard() {
       setFormLoading(false);
     }
   };
+
+  if (showSplash) {
+    return (
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6">
+        <div className="w-80 h-80">
+          <Lottie animationData={splashAnimation} loop={true} />
+        </div>
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="text-center mt-8"
+        >
+          <h2 className="text-3xl font-black text-slate-900 mb-2">Donor Portal</h2>
+          <p className="text-slate-500 font-medium uppercase tracking-widest text-xs">Preparing your impact dashboard...</p>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <DashboardLayout role="donor" userName={profile?.name || 'Donor'}>

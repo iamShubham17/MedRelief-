@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { dbService } from '@/services/dbService';
 import { DashboardLayout } from '@/components/DashboardLayout';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
+import Lottie from 'lottie-react';
+import splashAnimation from '@/assets/animations/AR Tablet.json';
 import { 
   ClipboardCheckIcon, 
   ShieldCheckIcon, 
@@ -15,12 +17,15 @@ export function PharmacistDashboard() {
   const { user, profile } = useAuth();
   const [queue, setQueue] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showSplash, setShowSplash] = useState(true);
   const [selectedDonation, setSelectedDonation] = useState<any>(null);
   const [notes, setNotes] = useState('');
   const [verifying, setVerifying] = useState(false);
 
   useEffect(() => {
     loadQueue();
+    const timer = setTimeout(() => setShowSplash(false), 2000);
+    return () => clearTimeout(timer);
   }, []);
 
   const loadQueue = async () => {
@@ -48,6 +53,25 @@ export function PharmacistDashboard() {
       setVerifying(false);
     }
   };
+
+  if (showSplash) {
+    return (
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6">
+        <div className="w-80 h-100">
+          <Lottie animationData={splashAnimation} loop={true} />
+        </div>
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="text-center mt-8"
+        >
+          <h2 className="text-3xl font-black text-slate-900 mb-2">Pharmacist Portal</h2>
+          <p className="text-slate-500 font-medium uppercase tracking-widest text-xs">Initializing verification engine...</p>
+        </motion.div>
+      </div>
+    );
+  }
 
   if (profile?.status === 'pending') {
     return (
