@@ -28,7 +28,10 @@ import {
   ArrowLeft,
   X,
   Construction,
-  CheckCircle
+  CheckCircle,
+  BarChart3,
+  Users,
+  ClipboardList
 } from 'lucide-react';
 
 export const MedicalServicesIcon = MedicalServices;
@@ -59,6 +62,9 @@ export const ArrowLeftIcon = ArrowLeft;
 export const XIcon = X;
 export const ConstructionIcon = Construction;
 export const CheckCircleIcon = CheckCircle;
+export const BarChart3Icon = BarChart3;
+export const UsersIcon = Users;
+export const ClipboardListIcon = ClipboardList;
 
 export {
   MedicalServices,
@@ -88,5 +94,8 @@ export {
   ArrowLeft,
   X,
   Construction,
-  CheckCircle
+  CheckCircle,
+  BarChart3,
+  Users,
+  ClipboardList
 };

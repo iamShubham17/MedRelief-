@@ -5,7 +5,7 @@ import { UserRole } from '@/types';
 import { dbService } from '@/services/dbService';
 import { motion, AnimatePresence } from 'framer-motion';
 import Lottie from 'lottie-react';
-import splashAnimation from '@/assets/animations/register.json';
+import splashAnimation from '@/assets/animations/splash-animation.json';
 import { 
   VolunteerActivism, 
   MedicalServices, 
@@ -50,6 +50,12 @@ const riderSchema = z.object({
   vehicleNumber: z.string().min(5, 'Vehicle number is required'),
 });
 
+const adminSchema = z.object({
+  name: z.string().min(2, 'Name is required'),
+  employeeId: z.string().min(4, 'Employee ID is required'),
+  department: z.string().min(2, 'Department is required'),
+});
+
 export function RegisterPage() {
   const { user, profile, refreshProfile } = useAuth();
   const navigate = useNavigate();
@@ -63,6 +69,7 @@ export function RegisterPage() {
   const ngoForm = useForm({ resolver: zodResolver(ngoSchema) });
   const patientForm = useForm({ resolver: zodResolver(patientSchema) });
   const riderForm = useForm({ resolver: zodResolver(riderSchema) });
+  const adminForm = useForm({ resolver: zodResolver(adminSchema) });
 
   useEffect(() => {
     if (user && profile) {
@@ -93,6 +100,7 @@ export function RegisterPage() {
         city: data.city,
         verified: true,
         mediPoints: 0,
+        status: 'approved',
       });
       await refreshProfile();
       navigate('/dashboard/donor');
@@ -151,6 +159,7 @@ export function RegisterPage() {
         ...data,
         phone: user.phoneNumber || '',
         verified: true,
+        status: 'approved',
       });
       await refreshProfile();
       navigate('/dashboard/patient');
@@ -169,6 +178,7 @@ export function RegisterPage() {
         ...data,
         phone: user.phoneNumber || '',
         verified: true,
+        status: 'approved',
       });
       await refreshProfile();
       setLoading(false);
@@ -179,6 +189,25 @@ export function RegisterPage() {
     } catch (err: any) {
       setLoading(false);
       alert('Registration failed: ' + err.message);
+    }
+  };
+
+  const onAdminSubmit = async (data: any) => {
+    setLoading(true);
+    try {
+      await dbService.createUserProfile(user.uid, {
+        role: 'admin',
+        ...data,
+        phone: user.phoneNumber || '',
+        verified: true,
+        status: 'approved', // Admins are auto-approved for this demo
+      });
+      await refreshProfile();
+      navigate('/dashboard/admin');
+    } catch (err: any) {
+      alert('Registration failed: ' + err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -220,7 +249,7 @@ export function RegisterPage() {
       {/* Left Panel: Realistic Brand Imagery */}
       <div className="hidden lg:block w-[45%] relative overflow-hidden bg-slate-900">
         <img 
-          src="/src/assets/images/img.png" 
+          src="/src/assets/images/register-hero.png" 
           alt="Medical Professional" 
           className="absolute inset-0 w-full h-full object-cover opacity-70 grayscale-[30%]"
           onError={(e) => {
@@ -463,6 +492,28 @@ export function RegisterPage() {
                       </div>
                       <button disabled={loading} type="submit" className="w-full bg-slate-900 text-white py-5 rounded-2xl font-black text-sm shadow-xl shadow-slate-900/20 hover:bg-slate-800 transition-all">
                         {loading ? 'Registering...' : 'Complete Registration'}
+                      </button>
+                    </form>
+                  )}
+
+                  {role === 'admin' && (
+                    <form onSubmit={adminForm.handleSubmit(onAdminSubmit)} className="space-y-8">
+                      <div className="space-y-3">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Full Name</label>
+                        <input {...adminForm.register('name')} className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-slate-900/10 transition-all font-bold text-slate-900" placeholder="System Administrator Name" />
+                      </div>
+                      <div className="grid grid-cols-2 gap-6">
+                        <div className="space-y-3">
+                          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Employee ID</label>
+                          <input {...adminForm.register('employeeId')} className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-slate-900/10 transition-all font-bold text-slate-900" placeholder="ADM-000" />
+                        </div>
+                        <div className="space-y-3">
+                          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Department</label>
+                          <input {...adminForm.register('department')} className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-slate-900/10 transition-all font-bold text-slate-900" placeholder="Operations" />
+                        </div>
+                      </div>
+                      <button disabled={loading} type="submit" className="w-full bg-slate-900 text-white py-5 rounded-2xl font-black text-sm shadow-xl shadow-slate-900/20 hover:bg-slate-800 transition-all">
+                        {loading ? 'Initializing...' : 'Activate Admin Console'}
                       </button>
                     </form>
                   )}

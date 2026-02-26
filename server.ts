@@ -109,6 +109,33 @@ async function startServer() {
     }
   });
 
+  app.get('/api/admin/stats', async (req, res) => {
+    try {
+      const userCount = await User.countDocuments();
+      const donationCount = await Donation.countDocuments();
+      const requestCount = await Request.countDocuments();
+      const pendingApprovals = await User.countDocuments({ status: 'pending' });
+      
+      res.json({
+        userCount,
+        donationCount,
+        requestCount,
+        pendingApprovals
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get('/api/admin/users', async (req, res) => {
+    try {
+      const users = await User.find().sort({ createdAt: -1 });
+      res.json(users);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // NGO Routes
   app.get('/api/donations/available', async (req, res) => {
     try {

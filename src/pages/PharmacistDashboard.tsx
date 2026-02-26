@@ -57,7 +57,7 @@ export function PharmacistDashboard() {
   if (showSplash) {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6">
-        <div className="w-80 h-80">
+        <div className="w-90 h-110">
           <Lottie animationData={splashAnimation} loop={true} />
         </div>
         <motion.div 

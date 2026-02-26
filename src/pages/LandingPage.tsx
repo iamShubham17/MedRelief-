@@ -1,5 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Player } from '@lottiefiles/react-lottie-player';
+import animationData from '@/assets/animations/register.json';
 import { 
   VolunteerActivism, 
   HeartIcon, 
@@ -77,14 +79,16 @@ export function LandingPage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="relative"
             >
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl">
-                <img 
-                  src="https://picsum.photos/seed/medicine/800/1000" 
-                  alt="Medicine redistribution" 
-                  className="aspect-[4/5] object-cover"
-                  referrerPolicy="no-referrer"
+              {/* Lottie Animation replacing the image */}
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl aspect-[4/5] bg-gradient-to-tr from-primary/5 to-transparent flex items-center justify-center">
+                <Player
+                  autoplay
+                  loop
+                  src={animationData}
+                  className="w-full h-full"
+                  style={{ width: '100%', height: '100%' }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent pointer-events-none"></div>
               </div>
 
               {/* Floating Impact Card */}

@@ -70,6 +70,18 @@ export const dbService = {
     return response.json();
   },
 
+  async getAdminStats() {
+    const response = await fetch(`${API_URL}/admin/stats`);
+    if (!response.ok) throw new Error('Failed to fetch admin stats');
+    return response.json();
+  },
+
+  async getAllUsers() {
+    const response = await fetch(`${API_URL}/admin/users`);
+    if (!response.ok) throw new Error('Failed to fetch all users');
+    return response.json();
+  },
+
   async getAvailableMedicines() {
     const response = await fetch(`${API_URL}/donations/available`);
     if (!response.ok) throw new Error('Failed to fetch available medicines');
