@@ -2,19 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth } from '@/config/firebase';
 import { dbService } from '@/services/dbService';
-
-export type UserRole = 'donor' | 'pharmacist' | 'ngo' | 'patient' | 'admin' | 'rider';
-
-interface UserProfile {
-  uid: string;
-  role: UserRole;
-  name?: string;
-  phone?: string;
-  verified: boolean;
-  status?: 'pending' | 'approved' | 'rejected';
-  city?: string;
-  mediPoints?: number;
-}
+import { UserRole, UserProfile } from '@/types';
 
 interface AuthContextType {
   user: User | null;

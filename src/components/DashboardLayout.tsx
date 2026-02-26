@@ -9,7 +9,8 @@ import {
   BellIcon
 } from '@/components/icons';
 import { cn } from '@/lib/utils';
-import { useAuth, UserRole } from '@/context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
+import { UserRole } from '@/types';
 import { auth } from '@/config/firebase';
 import { signOut } from 'firebase/auth';
 import { Logo } from '@/components/Logo';
@@ -31,7 +32,7 @@ export function DashboardLayout({ children, role, userName }: DashboardLayoutPro
   };
 
   const navItems = [
-    { label: 'Overview', icon: DashboardIcon, path: `/dashboard/${role}` },
+    { label: 'Dashboard', icon: DashboardIcon, path: `/dashboard/${role}` },
     { label: 'History', icon: HistoryIcon, path: `/dashboard/${role}/history` },
     { label: 'Profile', icon: UserIcon, path: `/dashboard/${role}/profile` },
     { label: 'Settings', icon: SettingsIcon, path: `/dashboard/${role}/settings` },

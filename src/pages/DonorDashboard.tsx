@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { dbService } from '@/services/dbService';
 import { DashboardLayout } from '@/components/DashboardLayout';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Lottie from 'lottie-react';
 import splashAnimation from '@/assets/animations/loading.json';
 import { 

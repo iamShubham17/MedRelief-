@@ -1,7 +1,7 @@
 import React from 'react';
 import { DashboardLayout } from '@/components/DashboardLayout';
 import { useAuth } from '@/context/AuthContext';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { 
   UserIcon, 
   MapPinIcon, 

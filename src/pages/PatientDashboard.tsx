@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { dbService } from '@/services/dbService';
 import { DashboardLayout } from '@/components/DashboardLayout';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Lottie from 'lottie-react';
 import splashAnimation from '@/assets/animations/preventive-health-care.json';
 import { 
@@ -62,7 +62,7 @@ export function PatientDashboard() {
   if (showSplash) {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6">
-        <div className="w-120 h-100">
+        <div className="w-80 h-80">
           <Lottie animationData={splashAnimation} loop={true} />
         </div>
         <motion.div 

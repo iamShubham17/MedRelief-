@@ -1,6 +1,7 @@
 import React from 'react';
 import { DashboardLayout } from '@/components/DashboardLayout';
-import { useAuth, UserRole } from '@/context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
+import { UserRole } from '@/types';
 import { ConstructionIcon } from '@/components/icons';
 import { useParams } from 'react-router-dom';
 

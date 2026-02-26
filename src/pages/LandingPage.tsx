@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { 
   VolunteerActivism, 
   HeartIcon, 
@@ -10,9 +10,25 @@ import {
 } from '@/components/icons';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
 
 export function LandingPage() {
+  const auth = useAuth();
+  const user = auth?.user;
+  const profile = auth?.profile;
+  const navigate = useNavigate();
+
+  const handleGetStarted = () => {
+    if (!user) {
+      navigate('/register');
+    } else if (profile) {
+      navigate(`/dashboard/${profile.role}`);
+    } else {
+      navigate('/login');
+    }
+  };
+
   return (
     <div className="min-h-screen">
       <Navbar />
@@ -39,14 +55,17 @@ export function LandingPage() {
                 Join the world's most trusted redistribution network. We connect unexpired surplus medicine with verified patients in need. Secure, transparent, and life-saving.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link 
-                  to="/donate"
+                <button 
+                  onClick={handleGetStarted}
                   className="flex items-center justify-center gap-2 bg-primary text-white px-8 py-4 rounded-xl font-bold text-lg shadow-xl shadow-primary/25 hover:shadow-primary/40 transition-all"
                 >
                   <VolunteerActivism className="w-6 h-6" />
-                  Donate Medicine
-                </Link>
-                <button className="flex items-center justify-center gap-2 bg-white text-slate-900 border-2 border-slate-200 px-8 py-4 rounded-xl font-bold text-lg hover:bg-slate-50 transition-all">
+                  {user ? 'Go to Dashboard' : 'Get Started Now'}
+                </button>
+                <button 
+                  onClick={() => navigate('/login')}
+                  className="flex items-center justify-center gap-2 bg-white text-slate-900 border-2 border-slate-200 px-8 py-4 rounded-xl font-bold text-lg hover:bg-slate-50 transition-all"
+                >
                   Request Medicine
                 </button>
               </div>
@@ -58,18 +77,15 @@ export function LandingPage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="relative"
             >
-            <div className="relative rounded-3xl overflow-hidden shadow-2xl">
-            <video
-              src="/videos/bs.mp4"
-               autoPlay
-                loop
-                 muted
-                   playsInline
-                     className="aspect-[4/5] object-cover w-full h-full"
-             />
-               <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent"></div>
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl">
+                <img 
+                  src="https://picsum.photos/seed/medicine/800/1000" 
+                  alt="Medicine redistribution" 
+                  className="aspect-[4/5] object-cover"
+                  referrerPolicy="no-referrer"
+                />
+                <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent"></div>
               </div>
-
 
               {/* Floating Impact Card */}
               <motion.div 
@@ -166,10 +182,16 @@ export function LandingPage() {
               <h3 className="text-4xl lg:text-6xl font-black tracking-tight mb-8">Ready to save a life today?</h3>
               <p className="text-xl text-slate-300 mb-10 leading-relaxed">Your surplus medicine could be someone's cure. Join thousands of individual donors and hospitals already making an impact.</p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link to="/donate" className="bg-white text-slate-900 px-10 py-4 rounded-xl font-black text-lg hover:bg-slate-100 transition-all shadow-2xl">
-                  Donate Now
-                </Link>
-                <button className="bg-primary text-white px-10 py-4 rounded-xl font-black text-lg border-2 border-primary hover:bg-primary/80 transition-all">
+                <button 
+                  onClick={handleGetStarted}
+                  className="bg-white text-slate-900 px-10 py-4 rounded-xl font-black text-lg hover:bg-slate-100 transition-all shadow-2xl"
+                >
+                  {user ? 'Go to Dashboard' : 'Join Now'}
+                </button>
+                <button 
+                  onClick={() => navigate('/login')}
+                  className="bg-primary text-white px-10 py-4 rounded-xl font-black text-lg border-2 border-primary hover:bg-primary/80 transition-all"
+                >
                   Partner with Us
                 </button>
               </div>

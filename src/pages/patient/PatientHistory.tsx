@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/DashboardLayout';
 import { useAuth } from '@/context/AuthContext';
 import { dbService } from '@/services/dbService';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { 
   ClockIcon, 
   CheckCircleIcon, 

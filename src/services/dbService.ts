@@ -1,4 +1,4 @@
-import { UserRole } from '@/context/AuthContext';
+import { UserRole } from '@/types';
 
 const API_URL = '/api';
 

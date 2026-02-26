@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/DashboardLayout';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Lottie from 'lottie-react';
 import splashAnimation from '@/assets/animations/Businessman flies up with rocket.json';
 import { useAuth } from '@/context/AuthContext';
@@ -35,14 +35,14 @@ export function RiderDashboard() {
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6">
-        <div className="w-180 h-100">
+        <div className="w-80 h-80">
           <Lottie animationData={splashAnimation} loop={true} />
         </div>
         <motion.div 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="text-center mt-4"
+          className="text-center mt-8"
         >
           <h2 className="text-3xl font-black text-slate-900 mb-2">Loading Dashboard</h2>
           <p className="text-slate-500 font-medium uppercase tracking-widest text-xs">Preparing your route...</p>

@@ -10,7 +10,7 @@ import {
 import { auth } from '@/config/firebase';
 import { dbService } from '@/services/dbService';
 import { useAuth } from '@/context/AuthContext';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import Lottie from 'lottie-react';
 import splashAnimation from '@/assets/animations/Appointment booking with smartphone.json';
 import { MedicalServices, ShieldCheckIcon } from '@/components/icons';
@@ -190,7 +190,7 @@ export function LoginPage() {
                     </button>
 
                     <p className="text-center text-xs font-bold text-slate-400 uppercase tracking-widest mt-4">
-                      New to MediShare+? <button onClick={() => navigate('/register')} className="text-primary hover:underline">Create an account</button>
+                      New to MedRelief+? <button onClick={() => navigate('/register')} className="text-primary hover:underline">Create an account</button>
                     </p>
                   </div>
                 ) : (
