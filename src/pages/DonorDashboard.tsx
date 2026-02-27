@@ -4,7 +4,7 @@ import { dbService } from '@/services/dbService';
 import { DashboardLayout } from '@/components/DashboardLayout';
 import { motion, AnimatePresence } from 'framer-motion';
 import Lottie from 'lottie-react';
-import splashAnimation from '@/assets/animations/loading.json';
+import splashAnimation from '@/assets/animations/SNAIL LOADER.json';
 import { 
   PlusCircleIcon, 
   PackageIcon, 
@@ -72,7 +72,7 @@ export function DonorDashboard() {
   if (showSplash) {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6">
-        <div className="w-80 h-80">
+        <div className="w-[600px] h-[500px]">
           <Lottie animationData={splashAnimation} loop={true} />
         </div>
         <motion.div 

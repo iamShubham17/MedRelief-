@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Player } from '@lottiefiles/react-lottie-player';
-import animationData from '@/assets/animations/register.json';
+import animationData from '@/assets/animations/Cloud robotics abstract.json';
 import { 
   VolunteerActivism, 
   HeartIcon, 

@@ -62,7 +62,7 @@ export function PatientDashboard() {
   if (showSplash) {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6">
-        <div className="w-80 h-80">
+        <div className="w-[600px] h-[500px]">
           <Lottie animationData={splashAnimation} loop={true} />
         </div>
         <motion.div 

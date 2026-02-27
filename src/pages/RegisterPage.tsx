@@ -6,6 +6,7 @@ import { dbService } from '@/services/dbService';
 import { motion, AnimatePresence } from 'framer-motion';
 import Lottie from 'lottie-react';
 import splashAnimation from '@/assets/animations/splash-animation.json';
+import bgAnimation from '@/assets/animations/Isometric data analysis.json';
 import { 
   VolunteerActivism, 
   MedicalServices, 
@@ -212,13 +213,15 @@ export function RegisterPage() {
   };
 
   const roles = [
-    { id: 'donor', label: 'Donor', icon: VolunteerActivism, desc: 'Contribute surplus medical supplies to our verified network.' },
-    { id: 'pharmacist', label: 'Pharmacist', icon: MedicalServices, desc: 'Verify and validate medical standards for distributed supplies.' },
-    { id: 'ngo', label: 'NGO', icon: HeartIcon, desc: 'Organizations managing large-scale medical relief distribution.' },
-    { id: 'patient', label: 'Patient', icon: PackageIcon, desc: 'Access essential medicines through our secure prescription portal.' },
-    { id: 'rider', label: 'Rider', icon: TruckIcon, desc: 'Facilitate secure, temperature-controlled medical transit.' },
-    { id: 'admin', label: 'Admin', icon: ShieldCheckIcon, desc: 'Manage system operations and institutional approvals.' },
+    { id: 'donor', label: 'Donor', icon: VolunteerActivism, desc: 'Contribute surplus medical supplies to our verified network.', color: 'from-blue-500/20 to-indigo-500/20' },
+    { id: 'pharmacist', label: 'Pharmacist', icon: MedicalServices, desc: 'Verify and validate medical standards for distributed supplies.', color: 'from-emerald-500/20 to-teal-500/20' },
+    { id: 'ngo', label: 'NGO', icon: HeartIcon, desc: 'Organizations managing large-scale medical relief distribution.', color: 'from-rose-500/20 to-pink-500/20' },
+    { id: 'patient', label: 'Patient', icon: PackageIcon, desc: 'Access essential medicines through our secure prescription portal.', color: 'from-amber-500/20 to-orange-500/20' },
+    { id: 'rider', label: 'Rider', icon: TruckIcon, desc: 'Facilitate secure, temperature-controlled medical transit.', color: 'from-slate-500/20 to-slate-700/20' },
+    { id: 'admin', label: 'Admin', icon: ShieldCheckIcon, desc: 'Manage system operations and institutional approvals.', color: 'from-violet-500/20 to-purple-500/20' },
   ];
+
+  const selectedRoleData = roles.find(r => r.id === role);
 
   return (
     <div className="min-h-screen flex bg-white font-sans selection:bg-slate-200">
@@ -246,46 +249,43 @@ export function RegisterPage() {
         )}
       </AnimatePresence>
 
-      {/* Left Panel: Realistic Brand Imagery */}
-      <div className="hidden lg:block w-[45%] relative overflow-hidden bg-slate-900">
-        <img 
-          src="/src/assets/images/register-hero.png" 
-          alt="Medical Professional" 
-          className="absolute inset-0 w-full h-full object-cover opacity-70 grayscale-[30%]"
-          onError={(e) => {
-            // Fallback to professional placeholder if local image is missing
-            (e.target as HTMLImageElement).src = "https://picsum.photos/seed/medical-mnc-pro/1200/1600";
-          }}
-          referrerPolicy="no-referrer"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-900/40 via-transparent to-slate-900/80"></div>
-        
-        <div className="absolute top-12 left-12 z-10 flex items-center gap-3">
-          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-2xl">
-            <ActivityIcon className="w-6 h-6 text-slate-900" />
+      {/* Left Panel */}
+      <div className="hidden lg:flex lg:flex-col w-[45%] overflow-hidden bg-white border-r border-slate-100">
+
+        {/* Top: Logo */}
+        <div className="flex-shrink-0 px-12 pt-10 flex items-center gap-3">
+          <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center shadow-lg">
+            <ActivityIcon className="w-6 h-6 text-white" />
           </div>
-          <span className="text-xl font-bold tracking-tight text-white">MedRelief<span className="text-white/60">+</span></span>
+          <span className="text-xl font-bold tracking-tight text-slate-900">MedRelief<span className="text-slate-400">+</span></span>
         </div>
 
-        <div className="absolute bottom-20 left-12 right-12 z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-[10px] font-bold uppercase tracking-widest text-white mb-6 border border-white/20">
+        {/* Middle: Lottie Animation */}
+        <div className="flex-1 flex items-center justify-center px-8 py-4 min-h-0">
+          <div className="w-full max-w-[700px]">
+            <Lottie animationData={bgAnimation} loop={true} />
+          </div>
+        </div>
+
+        {/* Bottom: Text Content */}
+        <div className="flex-shrink-0 px-12 pb-12">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-100 rounded-full text-[10px] font-bold uppercase tracking-widest text-slate-600 mb-5 border border-slate-200">
             Institutional Grade Infrastructure
           </div>
-          <h1 className="text-6xl font-black text-white leading-[1.1] mb-6 tracking-tighter">
+          <h1 className="text-5xl font-black text-slate-900 leading-[1.1] mb-4 tracking-tighter">
             Global Medical<br />
-            <span className="text-white/60">Supply Chain</span><br />
+            <span className="text-slate-400">Supply Chain</span><br />
             Excellence.
           </h1>
-          <p className="text-lg text-white/70 max-w-md font-medium leading-relaxed">
+          <p className="text-base text-slate-500 font-medium leading-relaxed mb-8">
             A professional ecosystem designed for the secure distribution of life-saving medical resources worldwide.
           </p>
-          
-          <div className="mt-12 flex items-center gap-8 pt-8 border-t border-white/10">
-            <div className="flex items-center gap-2 text-white/60">
+          <div className="flex items-center gap-8 pt-6 border-t border-slate-100">
+            <div className="flex items-center gap-2 text-slate-400">
               <Globe className="w-4 h-4" />
               <span className="text-[10px] font-bold uppercase tracking-widest">24/7 Global Support</span>
             </div>
-            <div className="flex items-center gap-2 text-white/60">
+            <div className="flex items-center gap-2 text-slate-400">
               <ShieldCheckIcon className="w-4 h-4" />
               <span className="text-[10px] font-bold uppercase tracking-widest">ISO 27001 Certified</span>
             </div>
@@ -294,8 +294,8 @@ export function RegisterPage() {
       </div>
 
       {/* Right Panel: Clean Professional Interface */}
-      <div className="flex-1 flex flex-col bg-[#FDFCFB] overflow-y-auto">
-        <header className="p-8 flex justify-end items-center gap-8 sticky top-0 bg-[#FDFCFB]/80 backdrop-blur-md z-50">
+      <div className="flex-1 flex flex-col bg-[#EFF6FF] overflow-y-auto">
+        <header className="p-8 flex justify-end items-center gap-8 sticky top-0 bg-[#EFF6FF]/80 backdrop-blur-md z-50">
           <button className="text-sm font-bold text-slate-400 hover:text-slate-900 transition-colors">Documentation</button>
           <button 
             onClick={() => navigate('/login')}
@@ -305,17 +305,17 @@ export function RegisterPage() {
           </button>
         </header>
 
-        <main className="flex-1 flex flex-col px-8 lg:px-20 py-12 max-w-4xl mx-auto w-full">
+        <main className="flex-1 flex flex-col px-8 lg:px-20 py-12 max-w-5xl mx-auto w-full relative">
           <AnimatePresence mode="wait">
             {step === 1 ? (
               <motion.div 
                 key="step1"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="space-y-12"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="h-full flex flex-col"
               >
-                <div>
+                <div className="mb-12">
                   <div className="flex items-center gap-2 mb-4">
                     <span className="w-8 h-[2px] bg-slate-900"></span>
                     <span className="text-xs font-black uppercase tracking-widest text-slate-900">Step 01 // Identity</span>
@@ -326,38 +326,97 @@ export function RegisterPage() {
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {roles.map((item) => (
-                    <button
-                      key={item.id}
-                      onClick={() => handleRoleSelect(item.id as UserRole)}
-                      className={`relative p-8 rounded-2xl border-2 text-left transition-all flex flex-col h-full ${
-                        role === item.id 
-                          ? 'border-slate-900 bg-white shadow-2xl shadow-slate-200' 
-                          : 'border-slate-100 bg-white hover:border-slate-200'
-                      }`}
-                    >
-                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-6 transition-colors ${
-                        role === item.id ? 'bg-slate-900 text-white' : 'bg-slate-50 text-slate-400'
-                      }`}>
-                        <item.icon className="w-6 h-6" />
-                      </div>
-                      <h3 className="text-xl font-bold text-slate-900 mb-2">{item.label}</h3>
-                      <p className="text-sm text-slate-500 font-medium leading-relaxed flex-1">{item.desc}</p>
-                      
-                      {role === item.id && (
+                {/* Carousel Container */}
+                <div className="relative flex-1 min-h-[400px]">
+                  <div className="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-12 no-scrollbar -mx-4 px-4">
+                    {roles.map((item) => (
+                      <motion.div
+                        key={item.id}
+                        layoutId={`card-${item.id}`}
+                        onClick={() => handleRoleSelect(item.id as UserRole)}
+                        className={`flex-shrink-0 w-[280px] h-[380px] snap-center cursor-pointer relative group rounded-[32px] overflow-hidden border transition-all duration-500 ${
+                          role === item.id 
+                            ? 'border-slate-900 shadow-2xl scale-105 z-10' 
+                            : 'border-slate-100 bg-white/50 backdrop-blur-sm hover:border-slate-200'
+                        }`}
+                      >
+                        <div className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-50 group-hover:opacity-100 transition-opacity`} />
+                        
+                        <div className="relative h-full p-8 flex flex-col">
+                          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-8 transition-all duration-500 ${
+                            role === item.id ? 'bg-slate-900 text-white scale-110' : 'bg-white shadow-sm text-slate-400'
+                          }`}>
+                            <item.icon className="w-7 h-7" />
+                          </div>
+                          
+                          <h3 className="text-2xl font-black text-slate-900 mb-3 tracking-tight">{item.label}</h3>
+                          <p className="text-sm text-slate-500 font-bold leading-relaxed opacity-80">{item.desc}</p>
+                          
+                          <div className="mt-auto flex items-center justify-between">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Institutional Role</span>
+                            {role === item.id && (
+                              <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="text-slate-900">
+                                <CheckCircleIcon className="w-6 h-6" />
+                              </motion.div>
+                            )}
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  {/* Expanded Overlay (Layout Morphing) */}
+                  <AnimatePresence>
+                    {role && (
+                      <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="absolute inset-0 z-50 pointer-events-none"
+                      >
+                        <div className="absolute inset-0 bg-[#EFF6FF]/60 backdrop-blur-xl pointer-events-auto" onClick={() => setRole(null)} />
+                        
                         <motion.div 
-                          layoutId="active-indicator"
-                          className="absolute top-6 right-6 text-slate-900"
+                          layoutId={`card-${role}`}
+                          className="absolute inset-0 m-auto w-full max-w-2xl h-[500px] bg-white rounded-[40px] shadow-[0_40px_80px_-15px_rgba(0,0,0,0.1)] border border-slate-100 overflow-hidden pointer-events-auto"
                         >
-                          <CheckCircleIcon className="w-6 h-6" />
+                          <div className={`absolute inset-0 bg-gradient-to-br ${selectedRoleData?.color} opacity-30`} />
+                          
+                          <div className="relative h-full p-12 flex flex-col lg:flex-row gap-12 items-center">
+                            <div className="w-32 h-32 rounded-[32px] bg-slate-900 text-white flex items-center justify-center flex-shrink-0 shadow-2xl shadow-slate-900/20">
+                              {selectedRoleData && <selectedRoleData.icon className="w-12 h-12" />}
+                            </div>
+                            
+                            <div className="flex-1 text-center lg:text-left">
+                              <h3 className="text-4xl font-black text-slate-900 mb-4 tracking-tighter">{selectedRoleData?.label}</h3>
+                              <p className="text-lg text-slate-500 font-medium leading-relaxed mb-8">
+                                {selectedRoleData?.desc}
+                              </p>
+                              
+                              <div className="flex flex-col sm:flex-row gap-4">
+                                <button 
+                                  onClick={handleContinue}
+                                  className="flex-1 px-8 py-5 bg-slate-900 text-white rounded-2xl font-black text-sm shadow-2xl shadow-slate-900/30 hover:bg-slate-800 transition-all flex items-center justify-center gap-3"
+                                >
+                                  Continue as {selectedRoleData?.label}
+                                  <ArrowLeftIcon className="w-4 h-4 rotate-180" />
+                                </button>
+                                <button 
+                                  onClick={() => setRole(null)}
+                                  className="px-8 py-5 bg-slate-100 text-slate-500 rounded-2xl font-black text-sm hover:bg-slate-200 transition-all"
+                                >
+                                  Change Role
+                                </button>
+                              </div>
+                            </div>
+                          </div>
                         </motion.div>
-                      )}
-                    </button>
-                  ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
 
-                <div className="pt-12 flex items-center justify-between border-t border-slate-100">
+                <div className="mt-auto pt-12 flex items-center justify-between border-t border-slate-100">
                   <div className="flex items-center gap-3">
                     <div className="flex -space-x-2">
                       {[1, 2, 3].map(i => (
@@ -368,14 +427,6 @@ export function RegisterPage() {
                     </div>
                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Joined by 12k+ professionals</p>
                   </div>
-                  <button 
-                    onClick={handleContinue}
-                    disabled={!role}
-                    className="px-12 py-4 bg-slate-900 text-white rounded-2xl font-black text-sm shadow-xl shadow-slate-900/20 hover:bg-slate-800 transition-all disabled:opacity-30 flex items-center gap-3"
-                  >
-                    Continue
-                    <ArrowLeftIcon className="w-4 h-4 rotate-180" />
-                  </button>
                 </div>
               </motion.div>
             ) : (

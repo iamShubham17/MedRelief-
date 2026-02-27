@@ -122,7 +122,7 @@ export function LoginPage() {
             animate={{ opacity: 1, x: 0 }}
             className="hidden lg:flex flex-col items-center justify-center text-center space-y-8"
           >
-            <div className="w-full max-w-md">
+            <div className="w-full max-w-2xl">
               <Lottie animationData={splashAnimation} loop={true} />
             </div>
             <div>

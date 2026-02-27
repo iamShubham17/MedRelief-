@@ -166,6 +166,35 @@ async function startServer() {
     }
   });
 
+  app.get('/api/requests/all', async (req, res) => {
+    try {
+      const requests = await Request.find().populate('medicineId').sort({ createdAt: -1 });
+      const requestsWithUsers = await Promise.all(requests.map(async (r) => {
+        const userData = await User.findOne({ firebaseUID: r.userId });
+        return {
+          ...r.toObject(),
+          id: r._id,
+          userId: userData || { name: 'Unknown', role: 'unknown' }
+        };
+      }));
+      res.json(requestsWithUsers);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.patch('/api/requests/:id/approve', async (req, res) => {
+    try {
+      const { decision, pharmacistId } = req.body;
+      const request = await Request.findByIdAndUpdate(req.params.id, {
+        status: decision === 'approved' ? 'approved' : 'rejected',
+      }, { new: true });
+      res.json(request);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({

@@ -104,5 +104,22 @@ export const dbService = {
     if (!response.ok) throw new Error('Failed to fetch user requests');
     const data = await response.json();
     return data.map((r: any) => ({ ...r, id: r._id }));
+  },
+
+  async getAllRequests() {
+    const response = await fetch(`${API_URL}/requests/all`);
+    if (!response.ok) throw new Error('Failed to fetch all requests');
+    const data = await response.json();
+    return data.map((r: any) => ({ ...r, id: r._id }));
+  },
+
+  async approveRequest(requestId: string, pharmacistId: string, decision: 'approved' | 'rejected') {
+    const response = await fetch(`${API_URL}/requests/${requestId}/approve`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ decision, pharmacistId }),
+    });
+    if (!response.ok) throw new Error('Failed to approve request');
+    return response.json();
   }
 };
