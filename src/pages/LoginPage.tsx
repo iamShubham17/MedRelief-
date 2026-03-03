@@ -14,6 +14,7 @@ import { motion } from 'framer-motion';
 import Lottie from 'lottie-react';
 import splashAnimation from '@/assets/animations/Appointment booking with smartphone.json';
 import { MedicalServices, ShieldCheckIcon } from '@/components/icons';
+import { Logo } from '@/components/Logo';
 
 export function LoginPage() {
   const { refreshProfile } = useAuth();
@@ -99,12 +100,7 @@ export function LoginPage() {
       
       <header className="w-full bg-white border-b border-slate-200 px-6 py-4 fixed top-0 z-50">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="text-primary">
-              <MedicalServices className="w-8 h-8" />
-            </div>
-            <h1 className="text-xl font-bold tracking-tight text-slate-900">MedRelief<span className="text-primary">+</span></h1>
-          </div>
+          <Logo size="sm" />
           <button 
             onClick={() => navigate('/register')}
             className="px-6 py-2 bg-slate-50 text-slate-900 rounded-xl font-bold text-sm border border-slate-200 hover:bg-slate-100 transition-all"

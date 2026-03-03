@@ -15,7 +15,7 @@ import {
   ShieldCheckIcon,
   PackageIcon,
   ArrowLeftIcon,
-  ActivityIcon,
+  ActivityIcon, 
   CheckCircleIcon,
   Globe
 } from '@/components/icons';

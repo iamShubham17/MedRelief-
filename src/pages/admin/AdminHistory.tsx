@@ -71,7 +71,7 @@ export function AdminHistory() {
                     transition={{ delay: i * 0.05 }}
                     className="text-sm hover:bg-slate-50/50 transition-colors"
                   >
-                    <td className="px-8 py-6 font-mono text-xs text-slate-400">...{log._id.slice(-6)}</td>
+                    <td className="px-8 py-6 font-mono text-xs text-slate-400">...{log._id?.toString().slice(-6) || 'N/A'}</td>
                     <td className="px-8 py-6">
                       <span className="font-bold text-slate-900">{log.action}</span>
                     </td>
@@ -90,6 +90,16 @@ export function AdminHistory() {
                     </td>
                   </motion.tr>
                 ))}
+                {loading && (
+                  <tr>
+                    <td colSpan={5} className="px-8 py-12 text-center">
+                      <div className="flex items-center justify-center gap-3">
+                        <div className="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                        <span className="text-sm font-bold text-slate-400">Loading logs...</span>
+                      </div>
+                    </td>
+                  </tr>
+                )}
                 {logs.length === 0 && !loading && (
                   <tr>
                     <td colSpan={5} className="px-8 py-12 text-center text-slate-400 font-bold">No audit logs found</td>

@@ -12,26 +12,7 @@ export function SplashScreen() {
         transition={{ duration: 0.8, ease: "easeOut" }}
         className="relative z-10 flex flex-col items-center gap-10 w-full max-w-md px-6"
       >
-        <Logo size="lg" iconOnly />
-        
-        <div className="text-center space-y-3">
-          <motion.h1 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="text-5xl font-black tracking-tighter text-slate-900"
-          >
-            MedRelief<span className="text-primary">+</span>
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="text-sm font-bold uppercase tracking-[0.3em] text-slate-400"
-          >
-            Digital Healthcare Excellence
-          </motion.p>
-        </div>
+        <Logo size="lg" variant="vertical" showSubtitle />
 
         <div className="w-64 h-1.5 bg-slate-100 rounded-full overflow-hidden relative">
           <motion.div 

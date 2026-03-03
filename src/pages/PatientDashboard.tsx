@@ -27,6 +27,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { auth } from '@/config/firebase';
 import { signOut } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
+import { Logo } from '@/components/Logo';
 
 export function PatientDashboard() {
   const { user, profile, refreshProfile } = useAuth();
@@ -186,11 +187,8 @@ export function PatientDashboard() {
     <div className="min-h-screen bg-[#f3f4f6] flex font-sans text-[#1a1d1f]">
       {/* Sidebar - Icons + Labels */}
       <aside className="w-64 bg-white border-r border-slate-100 flex flex-col py-8 sticky top-0 h-screen z-50">
-        <div className="px-8 mb-10 flex items-center gap-3">
-          <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center shadow-lg shadow-slate-200">
-            <PlusCircleIcon className="w-6 h-6 text-white" />
-          </div>
-          <span className="text-xl font-black tracking-tight text-slate-900">MedRelief+</span>
+        <div className="px-8 mb-10">
+          <Logo size="sm" />
         </div>
 
         <nav className="flex-grow px-4 space-y-1">

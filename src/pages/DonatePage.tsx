@@ -10,6 +10,7 @@ import {
 } from '@/components/icons';
 import { Link } from 'react-router-dom';
 import { Camera, Upload, Info, CheckCircle2, AlertCircle, Minus, Plus } from 'lucide-react';
+import { Logo } from '@/components/Logo';
 
 export function DonatePage() {
   const [step, setStep] = useState(2);
@@ -25,11 +26,8 @@ export function DonatePage() {
     <div className="min-h-screen bg-bg-light">
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="bg-primary p-1.5 rounded-lg flex items-center justify-center">
-              <MedicalServices className="text-white w-5 h-5" />
-            </div>
-            <h1 className="text-xl font-bold tracking-tight text-primary">MedRelief+</h1>
+          <Link to="/">
+            <Logo size="sm" />
           </Link>
           <nav className="hidden md:flex items-center gap-8">
             <Link to="/dashboard" className="text-sm font-medium hover:text-primary transition-colors">Dashboard</Link>

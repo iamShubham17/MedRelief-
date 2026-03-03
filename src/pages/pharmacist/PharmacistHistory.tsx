@@ -65,7 +65,7 @@ export function PharmacistHistory() {
                     transition={{ delay: i * 0.05 }}
                     className="text-sm hover:bg-slate-50/50 transition-colors"
                   >
-                    <td className="px-8 py-6 font-mono text-xs text-slate-400">...{item.id.slice(-6)}</td>
+                    <td className="px-8 py-6 font-mono text-xs text-slate-400">...{item.id?.toString().slice(-6) || 'N/A'}</td>
                     <td className="px-8 py-6">
                       <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${item.type === 'donation' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'}`}>
                         {item.type}
