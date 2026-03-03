@@ -11,8 +11,24 @@ import {
 
 export function PharmacistSettings() {
   const { profile } = useAuth();
-  const [notifications, setNotifications] = useState(true);
-  const [autoQueue, setAutoQueue] = useState(false);
+  const [notifications, setNotifications] = useState(() => {
+    return localStorage.getItem('ph_notifications') !== 'false';
+  });
+  const [autoQueue, setAutoQueue] = useState(() => {
+    return localStorage.getItem('ph_autoQueue') === 'true';
+  });
+
+  const toggleNotifications = () => {
+    const newVal = !notifications;
+    setNotifications(newVal);
+    localStorage.setItem('ph_notifications', String(newVal));
+  };
+
+  const toggleAutoQueue = () => {
+    const newVal = !autoQueue;
+    setAutoQueue(newVal);
+    localStorage.setItem('ph_autoQueue', String(newVal));
+  };
 
   return (
     <DashboardLayout role="pharmacist" userName={profile?.name || 'Pharmacist'}>
@@ -39,10 +55,10 @@ export function PharmacistSettings() {
               <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100">
                 <div>
                   <p className="text-sm font-bold text-slate-900">Auto-Refresh Queue</p>
-                  <p className="text-xs text-slate-500">Automatically update the verification queue every 5 minutes</p>
+                  <p className="text-xs text-slate-500">Automatically update the verification queue every 30 seconds</p>
                 </div>
                 <button 
-                  onClick={() => setAutoQueue(!autoQueue)}
+                  onClick={toggleAutoQueue}
                   className={`w-14 h-8 rounded-full transition-all relative ${autoQueue ? 'bg-amber-500' : 'bg-slate-200'}`}
                 >
                   <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-all ${autoQueue ? 'left-7' : 'left-1'}`}></div>
@@ -65,7 +81,7 @@ export function PharmacistSettings() {
                   <p className="text-xs text-slate-500">Get notified when new medicines are added to the queue</p>
                 </div>
                 <button 
-                  onClick={() => setNotifications(!notifications)}
+                  onClick={toggleNotifications}
                   className={`w-14 h-8 rounded-full transition-all relative ${notifications ? 'bg-amber-500' : 'bg-slate-200'}`}
                 >
                   <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-all ${notifications ? 'left-7' : 'left-1'}`}></div>

@@ -20,6 +20,16 @@ export const dbService = {
     return response.json();
   },
 
+  async updateUserProfile(firebaseUID: string, data: any) {
+    const response = await fetch(`${API_URL}/users`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ firebaseUID, ...data }),
+    });
+    if (!response.ok) throw new Error('Failed to update user profile');
+    return response.json();
+  },
+
   async createDonation(donorId: string, data: any) {
     const response = await fetch(`${API_URL}/donations`, {
       method: 'POST',
@@ -62,11 +72,19 @@ export const dbService = {
     return data.map((u: any) => ({ ...u, id: u.firebaseUID })); // Use firebaseUID as id for admin dashboard
   },
 
-  async approveUser(uid: string) {
+  async approveUser(uid: string, adminId: string) {
     const response = await fetch(`${API_URL}/admin/approve/${uid}`, {
       method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ adminId }),
     });
     if (!response.ok) throw new Error('Failed to approve user');
+    return response.json();
+  },
+
+  async getAdminHistory() {
+    const response = await fetch(`${API_URL}/admin/history`);
+    if (!response.ok) throw new Error('Failed to fetch admin history');
     return response.json();
   },
 
@@ -99,6 +117,16 @@ export const dbService = {
     return response.json();
   },
 
+  async createCustomRequest(userId: string, data: any) {
+    const response = await fetch(`${API_URL}/requests`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, ...data, isCustom: true }),
+    });
+    if (!response.ok) throw new Error('Failed to create custom request');
+    return response.json();
+  },
+
   async getUserRequests(userId: string) {
     const response = await fetch(`${API_URL}/requests?userId=${userId}`);
     if (!response.ok) throw new Error('Failed to fetch user requests');
@@ -120,6 +148,12 @@ export const dbService = {
       body: JSON.stringify({ decision, pharmacistId }),
     });
     if (!response.ok) throw new Error('Failed to approve request');
+    return response.json();
+  },
+
+  async getPharmacistHistory(pharmacistId: string) {
+    const response = await fetch(`${API_URL}/pharmacist/history?pharmacistId=${pharmacistId}`);
+    if (!response.ok) throw new Error('Failed to fetch pharmacist history');
     return response.json();
   }
 };

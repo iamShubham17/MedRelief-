@@ -30,14 +30,29 @@ const donationSchema = new mongoose.Schema({
   expiryDate: { type: String },
   quantity: { type: String },
   status: { type: String, enum: ['pending_verification', 'verified', 'rejected'], default: 'pending_verification' },
+  pharmacistId: { type: String },
+  notes: { type: String },
 }, { timestamps: true });
 
 const requestSchema = new mongoose.Schema({
   userId: { type: String, required: true }, // firebaseUID
-  medicineId: { type: mongoose.Schema.Types.ObjectId, ref: 'Donation', required: true },
+  medicineId: { type: mongoose.Schema.Types.ObjectId, ref: 'Donation', required: false },
+  customMedicineName: { type: String },
+  quantity: { type: String },
+  reason: { type: String },
   status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
+  pharmacistId: { type: String },
+}, { timestamps: true });
+
+const auditLogSchema = new mongoose.Schema({
+  action: { type: String, required: true },
+  target: { type: String },
+  targetRole: { type: String },
+  adminId: { type: String, required: true },
+  status: { type: String, enum: ['Success', 'Failed', 'Rejected'], default: 'Success' },
 }, { timestamps: true });
 
 export const User = mongoose.model('User', userSchema);
 export const Donation = mongoose.model('Donation', donationSchema);
 export const Request = mongoose.model('Request', requestSchema);
+export const AuditLog = mongoose.model('AuditLog', auditLogSchema);

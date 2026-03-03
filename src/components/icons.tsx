@@ -31,7 +31,8 @@ import {
   CheckCircle,
   BarChart3,
   Users,
-  ClipboardList
+  ClipboardList,
+  Calendar
 } from 'lucide-react';
 
 export const MedicalServicesIcon = MedicalServices;
@@ -65,6 +66,7 @@ export const CheckCircleIcon = CheckCircle;
 export const BarChart3Icon = BarChart3;
 export const UsersIcon = Users;
 export const ClipboardListIcon = ClipboardList;
+export const CalendarIcon = Calendar;
 
 export {
   MedicalServices,
@@ -97,5 +99,6 @@ export {
   CheckCircle,
   BarChart3,
   Users,
-  ClipboardList
+  ClipboardList,
+  Calendar
 };
