@@ -74,7 +74,7 @@ export function AdminDashboard() {
   };
 
   const chartData = [
-    { name: 'Users', value: stats?.userCount || 0, color: '#571adb' },
+    { name: 'Users', value: stats?.userCount || 0, color: '#79ee43' },
     { name: 'Donations', value: stats?.donationCount || 0, color: '#0E9F6E' },
     { name: 'Requests', value: stats?.requestCount || 0, color: '#F27D26' },
     { name: 'Pending', value: stats?.pendingApprovals || 0, color: '#E02424' },
