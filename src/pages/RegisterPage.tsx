@@ -6,7 +6,6 @@ import { dbService } from '@/services/dbService';
 import { motion, AnimatePresence } from 'framer-motion';
 import Lottie from 'lottie-react';
 import splashAnimation from '@/assets/animations/splash-animation.json';
-import bgAnimation from '@/assets/animations/Isometric data analysis.json';
 import { 
   VolunteerActivism, 
   MedicalServices, 
@@ -16,13 +15,22 @@ import {
   PackageIcon,
   ArrowLeftIcon,
   ActivityIcon, 
-  CheckCircleIcon,
-  Globe
+  Globe,
+  XIcon
 } from '@/components/icons';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 
+// --- Assets Import ---
+import DonorImg from '@/assets/images/donor-character.png'; 
+import PharmaImg from '@/assets/images/pharma-character.png';
+import NGOImg from '@/assets/images/ngo-character.png';
+import PatientImg from '@/assets/images/patient-character.png';
+import RiderImg from '@/assets/images/rider-character.png';
+import AdminImg from '@/assets/images/admin-character.png';
+
+// --- Form Schemas ---
 const donorSchema = z.object({
   name: z.string().min(2, 'Name is required'),
   city: z.string().min(2, 'City is required'),
@@ -57,6 +65,11 @@ const adminSchema = z.object({
   department: z.string().min(2, 'Department is required'),
 });
 
+// --- Shared input/label class helpers ---
+const inputCls = "w-full px-8 py-5 bg-slate-50 rounded-[24px] focus:outline-none focus:ring-2 focus:ring-slate-900/10 transition-all font-bold text-lg text-slate-800 placeholder:text-slate-300";
+const labelCls = "text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2 block mb-1";
+const errorCls = "text-xs text-rose-500 font-semibold ml-2 mt-1";
+
 export function RegisterPage() {
   const { user, profile, refreshProfile } = useAuth();
   const navigate = useNavigate();
@@ -65,32 +78,20 @@ export function RegisterPage() {
   const [showRiderAnimation, setShowRiderAnimation] = useState(false);
   const [step, setStep] = useState(1);
 
-  const donorForm = useForm({ resolver: zodResolver(donorSchema) });
+  const donorForm     = useForm({ resolver: zodResolver(donorSchema) });
   const pharmacistForm = useForm({ resolver: zodResolver(pharmacistSchema) });
-  const ngoForm = useForm({ resolver: zodResolver(ngoSchema) });
-  const patientForm = useForm({ resolver: zodResolver(patientSchema) });
-  const riderForm = useForm({ resolver: zodResolver(riderSchema) });
-  const adminForm = useForm({ resolver: zodResolver(adminSchema) });
+  const ngoForm       = useForm({ resolver: zodResolver(ngoSchema) });
+  const patientForm   = useForm({ resolver: zodResolver(patientSchema) });
+  const riderForm     = useForm({ resolver: zodResolver(riderSchema) });
+  const adminForm     = useForm({ resolver: zodResolver(adminSchema) });
 
   useEffect(() => {
-    if (user && profile) {
-      navigate(`/dashboard/${profile.role}`);
-    }
+    if (user && profile) navigate(`/dashboard/${profile.role}`);
   }, [user, profile, navigate]);
 
-  if (!user) {
-    navigate('/login');
-    return null;
-  }
+  if (!user) { navigate('/login'); return null; }
 
-  const handleRoleSelect = (selectedRole: UserRole) => {
-    setRole(selectedRole);
-  };
-
-  const handleContinue = () => {
-    if (role) setStep(2);
-  };
-
+  // --- Submit Handlers ---
   const onDonorSubmit = async (data: any) => {
     setLoading(true);
     try {
@@ -106,7 +107,7 @@ export function RegisterPage() {
       await refreshProfile();
       navigate('/dashboard/donor');
     } catch (err: any) {
-      alert('Registration failed: ' + err.message);
+      alert(err.message);
     } finally {
       setLoading(false);
     }
@@ -117,7 +118,10 @@ export function RegisterPage() {
     try {
       await dbService.createUserProfile(user.uid, {
         role: 'pharmacist',
-        ...data,
+        name: data.name,
+        licenseNumber: data.licenseNumber,
+        stateCouncil: data.stateCouncil,
+        pharmacyAddress: data.pharmacyAddress,
         phone: user.phoneNumber || '',
         licenseUrl: 'https://placeholder.com/license.pdf',
         status: 'pending',
@@ -126,7 +130,7 @@ export function RegisterPage() {
       await refreshProfile();
       navigate('/dashboard/pharmacist');
     } catch (err: any) {
-      alert('Registration failed: ' + err.message);
+      alert(err.message);
     } finally {
       setLoading(false);
     }
@@ -137,7 +141,9 @@ export function RegisterPage() {
     try {
       await dbService.createUserProfile(user.uid, {
         role: 'ngo',
-        ...data,
+        orgName: data.orgName,
+        regNumber: data.regNumber,
+        address: data.address,
         phone: user.phoneNumber || '',
         certUrl: 'https://placeholder.com/cert.pdf',
         status: 'pending',
@@ -146,7 +152,7 @@ export function RegisterPage() {
       await refreshProfile();
       navigate('/dashboard/ngo');
     } catch (err: any) {
-      alert('Registration failed: ' + err.message);
+      alert(err.message);
     } finally {
       setLoading(false);
     }
@@ -157,7 +163,8 @@ export function RegisterPage() {
     try {
       await dbService.createUserProfile(user.uid, {
         role: 'patient',
-        ...data,
+        name: data.name,
+        city: data.city,
         phone: user.phoneNumber || '',
         verified: true,
         status: 'approved',
@@ -165,7 +172,7 @@ export function RegisterPage() {
       await refreshProfile();
       navigate('/dashboard/patient');
     } catch (err: any) {
-      alert('Registration failed: ' + err.message);
+      alert(err.message);
     } finally {
       setLoading(false);
     }
@@ -176,7 +183,8 @@ export function RegisterPage() {
     try {
       await dbService.createUserProfile(user.uid, {
         role: 'rider',
-        ...data,
+        name: data.name,
+        vehicleNumber: data.vehicleNumber,
         phone: user.phoneNumber || '',
         verified: true,
         status: 'approved',
@@ -184,12 +192,10 @@ export function RegisterPage() {
       await refreshProfile();
       setLoading(false);
       setShowRiderAnimation(true);
-      setTimeout(() => {
-        navigate('/dashboard/rider');
-      }, 3500);
+      setTimeout(() => navigate('/dashboard/rider'), 3500);
     } catch (err: any) {
       setLoading(false);
-      alert('Registration failed: ' + err.message);
+      alert(err.message);
     }
   };
 
@@ -198,384 +204,361 @@ export function RegisterPage() {
     try {
       await dbService.createUserProfile(user.uid, {
         role: 'admin',
-        ...data,
+        name: data.name,
+        employeeId: data.employeeId,
+        department: data.department,
         phone: user.phoneNumber || '',
         verified: true,
-        status: 'approved', // Admins are auto-approved for this demo
+        status: 'approved',
       });
       await refreshProfile();
       navigate('/dashboard/admin');
     } catch (err: any) {
-      alert('Registration failed: ' + err.message);
+      alert(err.message);
     } finally {
       setLoading(false);
     }
   };
 
   const roles = [
-    { id: 'donor', label: 'Donor', icon: VolunteerActivism, desc: 'Contribute surplus medical supplies to our verified network.', color: 'from-blue-500/20 to-indigo-500/20' },
-    { id: 'pharmacist', label: 'Pharmacist', icon: MedicalServices, desc: 'Verify and validate medical standards for distributed supplies.', color: 'from-emerald-500/20 to-teal-500/20' },
-    { id: 'ngo', label: 'NGO', icon: HeartIcon, desc: 'Organizations managing large-scale medical relief distribution.', color: 'from-rose-500/20 to-pink-500/20' },
-    { id: 'patient', label: 'Patient', icon: PackageIcon, desc: 'Access essential medicines through our secure prescription portal.', color: 'from-amber-500/20 to-orange-500/20' },
-    { id: 'rider', label: 'Rider', icon: TruckIcon, desc: 'Facilitate secure, temperature-controlled medical transit.', color: 'from-slate-500/20 to-slate-700/20' },
-    { id: 'admin', label: 'Admin', icon: ShieldCheckIcon, desc: 'Manage system operations and institutional approvals.', color: 'from-violet-500/20 to-purple-500/20' },
+    { id: 'donor',      label: 'Donor',       icon: VolunteerActivism, image: DonorImg,  desc: 'Contribute surplus medical supplies to our verified network.',                color: 'from-blue-600 to-indigo-700'   },
+    { id: 'pharmacist', label: 'Pharmacist',   icon: MedicalServices,   image: PharmaImg, desc: 'Verify and validate medical standards for distributed supplies.',             color: 'from-emerald-500 to-teal-600'  },
+    { id: 'ngo',        label: 'NGO',          icon: HeartIcon,         image: NGOImg,    desc: 'Organizations managing large-scale medical relief distribution.',             color: 'from-rose-500 to-pink-600'     },
+    { id: 'patient',    label: 'Patient',      icon: PackageIcon,       image: PatientImg,desc: 'Access essential medicines through our secure portal.',                      color: 'from-amber-500 to-orange-600'  },
+    { id: 'rider',      label: 'Rider',        icon: TruckIcon,         image: RiderImg,  desc: 'Facilitate secure, temperature-controlled medical transit.',                 color: 'from-slate-600 to-slate-800'   },
+    { id: 'admin',      label: 'Admin',        icon: ShieldCheckIcon,   image: AdminImg,  desc: 'Manage system operations and institutional approvals.',                      color: 'from-violet-600 to-purple-700' },
   ];
 
   const selectedRoleData = roles.find(r => r.id === role);
 
   return (
-    <div className="min-h-screen flex bg-white font-sans selection:bg-slate-200">
+    <div className="min-h-screen flex bg-[#F8FAFC] font-sans overflow-hidden">
+
+      {/* Rider Success Animation Overlay */}
       <AnimatePresence>
         {showRiderAnimation && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 bg-white z-[200] flex flex-col items-center justify-center p-6"
           >
             <div className="w-80 h-80">
               <Lottie animationData={splashAnimation} loop={true} />
             </div>
-            <motion.div 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className="text-center mt-8"
-            >
-              <h2 className="text-3xl font-black text-slate-900 mb-2">Initializing Network...</h2>
-              <p className="text-slate-500 font-medium">Setting up your professional logistics dashboard.</p>
-            </motion.div>
+            <h2 className="text-3xl font-black text-slate-900 mt-8 tracking-tighter">Initializing Network...</h2>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Left Panel */}
-      <div className="hidden lg:flex lg:flex-col w-[45%] overflow-hidden bg-white border-r border-slate-100">
-
-        {/* Top: Logo */}
-        <div className="flex-shrink-0 px-12 pt-10 flex items-center gap-3">
+      {/* Left Branding Panel */}
+      <div className="hidden lg:flex lg:flex-col w-[30%] bg-white border-r border-slate-100 p-12 justify-between shrink-0">
+        <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center shadow-lg">
             <ActivityIcon className="w-6 h-6 text-white" />
           </div>
-          <span className="text-xl font-bold tracking-tight text-slate-900">MedRelief<span className="text-slate-400">+</span></span>
+          <span className="text-xl font-bold text-slate-900">MedRelief<span className="text-blue-500">+</span></span>
         </div>
-
-        {/* Middle: Lottie Animation */}
-        <div className="flex-1 flex items-center justify-center px-8 py-4 min-h-0">
-          <div className="w-full max-w-[700px]">
-            <Lottie animationData={bgAnimation} loop={true} />
-          </div>
-        </div>
-
-        {/* Bottom: Text Content */}
-        <div className="flex-shrink-0 px-12 pb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-100 rounded-full text-[10px] font-bold uppercase tracking-widest text-slate-600 mb-5 border border-slate-200">
-            Institutional Grade Infrastructure
-          </div>
-          <h1 className="text-5xl font-black text-slate-900 leading-[1.1] mb-4 tracking-tighter">
-            Global Medical<br />
-            <span className="text-slate-400">Supply Chain</span><br />
-            Excellence.
+        <div>
+          <h1 className="text-5xl font-black text-slate-900 tracking-tighter leading-none mb-6 italic uppercase">
+            Next Gen<br/><span className="text-slate-300">Relief.</span>
           </h1>
-          <p className="text-base text-slate-500 font-medium leading-relaxed mb-8">
-            A professional ecosystem designed for the secure distribution of life-saving medical resources worldwide.
+          <p className="text-slate-500 font-medium leading-relaxed">
+            Secure, institutional-grade infrastructure for global medical supply chain excellence.
           </p>
-          <div className="flex items-center gap-8 pt-6 border-t border-slate-100">
-            <div className="flex items-center gap-2 text-slate-400">
-              <Globe className="w-4 h-4" />
-              <span className="text-[10px] font-bold uppercase tracking-widest">24/7 Global Support</span>
-            </div>
-            <div className="flex items-center gap-2 text-slate-400">
-              <ShieldCheckIcon className="w-4 h-4" />
-              <span className="text-[10px] font-bold uppercase tracking-widest">ISO 27001 Certified</span>
-            </div>
+        </div>
+        <div className="space-y-4">
+          <div className="flex items-center gap-3 text-slate-400 font-bold text-[10px] uppercase tracking-widest">
+            <Globe className="w-4 h-4"/> 24/7 Global Infrastructure
+          </div>
+          <div className="flex items-center gap-3 text-slate-400 font-bold text-[10px] uppercase tracking-widest">
+            <ShieldCheckIcon className="w-4 h-4"/> ISO Certified Network
           </div>
         </div>
       </div>
 
-      {/* Right Panel: Clean Professional Interface */}
-      <div className="flex-1 flex flex-col bg-[#EFF6FF] overflow-y-auto">
-        <header className="p-8 flex justify-end items-center gap-8 sticky top-0 bg-[#EFF6FF]/80 backdrop-blur-md z-50">
-          <button className="text-sm font-bold text-slate-400 hover:text-slate-900 transition-colors">Documentation</button>
-          <button 
+      {/* Right Interaction Panel */}
+      <div className="flex-1 relative flex flex-col overflow-y-auto overflow-x-hidden bg-[#F1F5F9]">
+        <header className="p-8 flex justify-end sticky top-0 z-30">
+          <button
             onClick={() => navigate('/login')}
-            className="px-6 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-900 hover:shadow-sm transition-all"
+            className="px-6 py-2 bg-white shadow-sm border border-slate-200 rounded-full text-sm font-bold hover:bg-slate-50 transition-all"
           >
             Sign In
           </button>
         </header>
 
-        <main className="flex-1 flex flex-col px-8 lg:px-20 py-12 max-w-5xl mx-auto w-full relative">
+        <main className="flex-1 px-6 lg:px-16 pb-20">
           <AnimatePresence mode="wait">
+
+            {/* ── STEP 1: Role Selection Carousel ── */}
             {step === 1 ? (
-              <motion.div 
-                key="step1"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="h-full flex flex-col"
-              >
+              <motion.div key="selection" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, x: -50 }} className="h-full flex flex-col">
                 <div className="mb-12">
-                  <div className="flex items-center gap-2 mb-4">
-                    <span className="w-8 h-[2px] bg-slate-900"></span>
-                    <span className="text-xs font-black uppercase tracking-widest text-slate-900">Step 01 // Identity</span>
-                  </div>
-                  <h2 className="text-5xl font-black text-slate-900 tracking-tighter mb-4">Select Your Role.</h2>
-                  <p className="text-lg text-slate-500 font-medium">
-                    Choose the professional capacity in which you will interact with the MedRelief network.
-                  </p>
+                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-600 mb-2 block">Step 01 // Identity</span>
+                  <h2 className="text-6xl font-black text-slate-900 tracking-tighter">Select Your Role.</h2>
                 </div>
 
-                {/* Carousel Container */}
-                <div className="relative flex-1 min-h-[400px]">
-                  <div className="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-12 no-scrollbar -mx-4 px-4">
-                    {roles.map((item) => (
+                {/* Disney-style Horizontal Carousel */}
+                <div className="flex gap-10 overflow-x-auto pb-20 pt-24 no-scrollbar snap-x snap-mandatory px-4">
+                  {roles.map((item) => (
+                    <motion.div
+                      key={item.id}
+                      layoutId={`card-${item.id}`}
+                      onClick={() => setRole(item.id as UserRole)}
+                      whileHover={{ y: -10 }}
+                      className="relative flex-shrink-0 w-[320px] h-[450px] rounded-[50px] cursor-pointer snap-center shadow-2xl group overflow-visible"
+                    >
+                      {/* Gradient Base */}
+                      <div className={`absolute inset-0 bg-gradient-to-b ${item.color} rounded-[50px] z-10 shadow-inner`} />
+
+                      {/* Character Pop-out Image */}
+                      <motion.img
+                        src={item.image}
+                        alt={item.label}
+                        initial={{ y: 0 }}
+                        whileHover={{ y: -60, scale: 1.15 }}
+                        transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+                        className="absolute -top-24 left-0 right-0 mx-auto w-64 h-64 object-contain z-30 drop-shadow-[0_35px_35px_rgba(0,0,0,0.4)] pointer-events-none"
+                      />
+
+                      {/* Card Content */}
+                      <div className="absolute bottom-0 left-0 right-0 p-10 z-20 text-white">
+                        <h3 className="text-4xl font-black mb-2 tracking-tighter">{item.label}</h3>
+                        <p className="text-xs font-medium opacity-70 leading-relaxed line-clamp-2">{item.desc}</p>
+                        <div className="mt-8 flex items-center justify-between">
+                          <span className="text-[9px] font-black uppercase tracking-widest opacity-50">Authorized</span>
+                          <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center group-hover:bg-white/40 transition-all">
+                            <ArrowLeftIcon className="w-5 h-5 rotate-180" />
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* Role Expanded Overlay */}
+                <AnimatePresence>
+                  {role && selectedRoleData && (
+                    <motion.div
+                      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                      className="fixed inset-0 z-50 flex items-center justify-center p-4 lg:p-12 bg-slate-900/40 backdrop-blur-xl"
+                    >
                       <motion.div
-                        key={item.id}
-                        layoutId={`card-${item.id}`}
-                        onClick={() => handleRoleSelect(item.id as UserRole)}
-                        className={`flex-shrink-0 w-[280px] h-[380px] snap-center cursor-pointer relative group rounded-[32px] overflow-hidden border transition-all duration-500 ${
-                          role === item.id 
-                            ? 'border-slate-900 shadow-2xl scale-105 z-10' 
-                            : 'border-slate-100 bg-white/50 backdrop-blur-sm hover:border-slate-200'
-                        }`}
+                        layoutId={`card-${role}`}
+                        className="bg-white w-full max-w-6xl h-[600px] rounded-[60px] overflow-hidden shadow-2xl flex flex-col lg:flex-row relative"
                       >
-                        <div className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-50 group-hover:opacity-100 transition-opacity`} />
-                        
-                        <div className="relative h-full p-8 flex flex-col">
-                          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-8 transition-all duration-500 ${
-                            role === item.id ? 'bg-slate-900 text-white scale-110' : 'bg-white shadow-sm text-slate-400'
-                          }`}>
-                            <item.icon className="w-7 h-7" />
-                          </div>
-                          
-                          <h3 className="text-2xl font-black text-slate-900 mb-3 tracking-tight">{item.label}</h3>
-                          <p className="text-sm text-slate-500 font-bold leading-relaxed opacity-80">{item.desc}</p>
-                          
-                          <div className="mt-auto flex items-center justify-between">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Institutional Role</span>
-                            {role === item.id && (
-                              <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="text-slate-900">
-                                <CheckCircleIcon className="w-6 h-6" />
-                              </motion.div>
-                            )}
-                          </div>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-
-                  {/* Expanded Overlay (Layout Morphing) */}
-                  <AnimatePresence>
-                    {role && (
-                      <motion.div 
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="absolute inset-0 z-50 pointer-events-none"
-                      >
-                        <div className="absolute inset-0 bg-[#EFF6FF]/60 backdrop-blur-xl pointer-events-auto" onClick={() => setRole(null)} />
-                        
-                        <motion.div 
-                          layoutId={`card-${role}`}
-                          className="absolute inset-0 m-auto w-full max-w-2xl h-[500px] bg-white rounded-[40px] shadow-[0_40px_80px_-15px_rgba(0,0,0,0.1)] border border-slate-100 overflow-hidden pointer-events-auto"
+                        <button
+                          onClick={() => setRole(null)}
+                          className="absolute top-8 right-8 z-30 p-3 bg-slate-100 rounded-full hover:bg-slate-200 transition-all"
                         >
-                          <div className={`absolute inset-0 bg-gradient-to-br ${selectedRoleData?.color} opacity-30`} />
-                          
-                          <div className="relative h-full p-12 flex flex-col lg:flex-row gap-12 items-center">
-                            <div className="w-32 h-32 rounded-[32px] bg-slate-900 text-white flex items-center justify-center flex-shrink-0 shadow-2xl shadow-slate-900/20">
-                              {selectedRoleData && <selectedRoleData.icon className="w-12 h-12" />}
-                            </div>
-                            
-                            <div className="flex-1 text-center lg:text-left">
-                              <h3 className="text-4xl font-black text-slate-900 mb-4 tracking-tighter">{selectedRoleData?.label}</h3>
-                              <p className="text-lg text-slate-500 font-medium leading-relaxed mb-8">
-                                {selectedRoleData?.desc}
-                              </p>
-                              
-                              <div className="flex flex-col sm:flex-row gap-4">
-                                <button 
-                                  onClick={handleContinue}
-                                  className="flex-1 px-8 py-5 bg-slate-900 text-white rounded-2xl font-black text-sm shadow-2xl shadow-slate-900/30 hover:bg-slate-800 transition-all flex items-center justify-center gap-3"
-                                >
-                                  Continue as {selectedRoleData?.label}
-                                  <ArrowLeftIcon className="w-4 h-4 rotate-180" />
-                                </button>
-                                <button 
-                                  onClick={() => setRole(null)}
-                                  className="px-8 py-5 bg-slate-100 text-slate-500 rounded-2xl font-black text-sm hover:bg-slate-200 transition-all"
-                                >
-                                  Change Role
-                                </button>
-                              </div>
-                            </div>
+                          <XIcon className="w-6 h-6"/>
+                        </button>
+
+                        {/* Left Visual */}
+                        <div className={`lg:w-1/2 p-12 flex flex-col justify-center items-center text-white relative bg-gradient-to-br ${selectedRoleData.color} overflow-hidden`}>
+                          <motion.img
+                            src={selectedRoleData.image}
+                            alt={selectedRoleData.label}
+                            initial={{ x: -100, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            className="w-[120%] h-[120%] object-contain z-10 drop-shadow-2xl scale-125 translate-x-[-10%]"
+                          />
+                          <h1 className="absolute text-[15rem] font-black text-white/10 uppercase tracking-tighter select-none rotate-90 right-[-15%] whitespace-nowrap z-0">
+                            {selectedRoleData.label}
+                          </h1>
+                        </div>
+
+                        {/* Right Details */}
+                        <div className="lg:w-1/2 p-16 flex flex-col justify-center">
+                          <span className="text-blue-600 font-black text-xs uppercase tracking-[0.4em] mb-4">MedRelief System</span>
+                          <h2 className="text-7xl font-black text-slate-900 mb-6 tracking-tighter leading-none">{selectedRoleData.label}</h2>
+                          <p className="text-slate-500 text-lg font-medium leading-relaxed mb-12">{selectedRoleData.desc}</p>
+                          <div className="space-y-4">
+                            <button
+                              onClick={() => setStep(2)}
+                              className="w-full py-6 bg-slate-900 text-white rounded-[30px] font-black text-lg hover:scale-[1.02] active:scale-[0.98] transition-all shadow-2xl shadow-slate-900/30"
+                            >
+                              Confirm Selection
+                            </button>
+                            <button
+                              onClick={() => setRole(null)}
+                              className="w-full py-6 bg-slate-100 text-slate-500 rounded-[30px] font-black text-lg hover:bg-slate-200 transition-all"
+                            >
+                              Go Back
+                            </button>
                           </div>
-                        </motion.div>
+                        </div>
                       </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-
-                <div className="mt-auto pt-12 flex items-center justify-between border-t border-slate-100">
-                  <div className="flex items-center gap-3">
-                    <div className="flex -space-x-2">
-                      {[1, 2, 3].map(i => (
-                        <div key={i} className="w-8 h-8 rounded-full border-2 border-white overflow-hidden bg-slate-100">
-                          <img src={`https://picsum.photos/seed/user-${i}/32/32`} alt="User" referrerPolicy="no-referrer" />
-                        </div>
-                      ))}
-                    </div>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Joined by 12k+ professionals</p>
-                  </div>
-                </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </motion.div>
+
             ) : (
-              <motion.div 
-                key="step2"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="space-y-12"
-              >
-                <div>
-                  <button onClick={() => setStep(1)} className="flex items-center gap-2 text-slate-400 font-bold text-sm mb-8 hover:text-slate-900 transition-all">
-                    <ArrowLeftIcon className="w-4 h-4" />
-                    Back to Selection
-                  </button>
-                  <div className="flex items-center gap-2 mb-4">
-                    <span className="w-8 h-[2px] bg-slate-900"></span>
-                    <span className="text-xs font-black uppercase tracking-widest text-slate-900">Step 02 // Credentials</span>
+              /* ── STEP 2: Registration Form ── */
+              <motion.div key="form" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} className="max-w-2xl mx-auto py-10">
+                <button
+                  onClick={() => { setStep(1); setRole(null); }}
+                  className="flex items-center gap-2 text-slate-400 font-bold text-sm mb-12 hover:text-slate-900 transition-all"
+                >
+                  <ArrowLeftIcon className="w-4 h-4" /> Change Role
+                </button>
+
+                {selectedRoleData && (
+                  <div className="mb-12 flex items-center gap-8">
+                    <div className={`w-24 h-24 rounded-[32px] flex items-center justify-center text-white shadow-xl bg-gradient-to-br ${selectedRoleData.color}`}>
+                      <selectedRoleData.icon className="w-12 h-12" />
+                    </div>
+                    <div>
+                      <h2 className="text-5xl font-black text-slate-900 tracking-tighter">Complete Profile.</h2>
+                      <p className="text-slate-500 font-medium">Verify your {selectedRoleData.label} credentials.</p>
+                    </div>
                   </div>
-                  <h2 className="text-5xl font-black text-slate-900 tracking-tighter mb-4">Account Setup.</h2>
-                  <p className="text-lg text-slate-500 font-medium">
-                    Provide your institutional details to finalize your profile on the network.
-                  </p>
-                </div>
+                )}
 
-                <div className="bg-white p-10 rounded-[32px] border border-slate-100 shadow-sm">
+                <div className="bg-white p-12 rounded-[50px] shadow-sm border border-slate-50">
+
+                  {/* ── DONOR FORM ── */}
                   {role === 'donor' && (
-                    <form onSubmit={donorForm.handleSubmit(onDonorSubmit)} className="space-y-8">
-                      <div className="space-y-3">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Full Name</label>
-                        <input {...donorForm.register('name')} className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-slate-900/10 transition-all font-bold text-slate-900" placeholder="Your Name" />
+                    <form onSubmit={donorForm.handleSubmit(onDonorSubmit)} className="space-y-6">
+                      <div>
+                        <label className={labelCls}>Full Name</label>
+                        <input {...donorForm.register('name')} className={inputCls} placeholder="John Doe" />
+                        {donorForm.formState.errors.name && <p className={errorCls}>{donorForm.formState.errors.name.message as string}</p>}
                       </div>
-                      <div className="space-y-3">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">City</label>
-                        <input {...donorForm.register('city')} className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-slate-900/10 transition-all font-bold text-slate-900" placeholder="Your City" />
+                      <div>
+                        <label className={labelCls}>City</label>
+                        <input {...donorForm.register('city')} className={inputCls} placeholder="Mumbai" />
+                        {donorForm.formState.errors.city && <p className={errorCls}>{donorForm.formState.errors.city.message as string}</p>}
                       </div>
-                      <button disabled={loading} type="submit" className="w-full bg-slate-900 text-white py-5 rounded-2xl font-black text-sm shadow-xl shadow-slate-900/20 hover:bg-slate-800 transition-all">
-                        {loading ? 'Processing...' : 'Complete Registration'}
+                      <button disabled={loading} type="submit" className="w-full bg-slate-900 text-white py-6 rounded-[24px] font-black text-lg shadow-xl shadow-slate-900/20 disabled:opacity-60 transition-all">
+                        {loading ? 'Processing...' : 'Access Network'}
                       </button>
                     </form>
                   )}
 
+                  {/* ── PHARMACIST FORM ── */}
                   {role === 'pharmacist' && (
-                    <form onSubmit={pharmacistForm.handleSubmit(onPharmacistSubmit)} className="space-y-8">
-                      <div className="space-y-3">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Full Name (as per license)</label>
-                        <input {...pharmacistForm.register('name')} className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-slate-900/10 transition-all font-bold text-slate-900" />
+                    <form onSubmit={pharmacistForm.handleSubmit(onPharmacistSubmit)} className="space-y-6">
+                      <div>
+                        <label className={labelCls}>Full Name</label>
+                        <input {...pharmacistForm.register('name')} className={inputCls} placeholder="Dr. Jane Smith" />
+                        {pharmacistForm.formState.errors.name && <p className={errorCls}>{pharmacistForm.formState.errors.name.message as string}</p>}
                       </div>
-                      <div className="grid grid-cols-2 gap-6">
-                        <div className="space-y-3">
-                          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">License Number</label>
-                          <input {...pharmacistForm.register('licenseNumber')} className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-slate-900/10 transition-all font-bold text-slate-900" />
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className={labelCls}>License No.</label>
+                          <input {...pharmacistForm.register('licenseNumber')} className={inputCls} placeholder="MH-12345" />
+                          {pharmacistForm.formState.errors.licenseNumber && <p className={errorCls}>{pharmacistForm.formState.errors.licenseNumber.message as string}</p>}
                         </div>
-                        <div className="space-y-3">
-                          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">State Council</label>
-                          <input {...pharmacistForm.register('stateCouncil')} className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-slate-900/10 transition-all font-bold text-slate-900" />
+                        <div>
+                          <label className={labelCls}>State Council</label>
+                          <input {...pharmacistForm.register('stateCouncil')} className={inputCls} placeholder="Maharashtra" />
+                          {pharmacistForm.formState.errors.stateCouncil && <p className={errorCls}>{pharmacistForm.formState.errors.stateCouncil.message as string}</p>}
                         </div>
                       </div>
-                      <div className="space-y-3">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Pharmacy Address</label>
-                        <textarea {...pharmacistForm.register('pharmacyAddress')} className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-slate-900/10 transition-all font-bold text-slate-900" rows={3} />
+                      <div>
+                        <label className={labelCls}>Pharmacy Address</label>
+                        <textarea {...pharmacistForm.register('pharmacyAddress')} className={`${inputCls} resize-none`} placeholder="123 Medical Lane, Mumbai - 400001" rows={3} />
+                        {pharmacistForm.formState.errors.pharmacyAddress && <p className={errorCls}>{pharmacistForm.formState.errors.pharmacyAddress.message as string}</p>}
                       </div>
-                      <button disabled={loading} type="submit" className="w-full bg-slate-900 text-white py-5 rounded-2xl font-black text-sm shadow-xl shadow-slate-900/20 hover:bg-slate-800 transition-all">
-                        {loading ? 'Uploading...' : 'Submit for Approval'}
+                      <button disabled={loading} type="submit" className="w-full bg-slate-900 text-white py-6 rounded-[24px] font-black text-lg shadow-xl shadow-slate-900/20 disabled:opacity-60 transition-all">
+                        {loading ? 'Submitting...' : 'Submit Verification'}
                       </button>
                     </form>
                   )}
 
+                  {/* ── NGO FORM ── */}
                   {role === 'ngo' && (
-                    <form onSubmit={ngoForm.handleSubmit(onNGOSubmit)} className="space-y-8">
-                      <div className="space-y-3">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Organization Name</label>
-                        <input {...ngoForm.register('orgName')} className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-slate-900/10 transition-all font-bold text-slate-900" />
+                    <form onSubmit={ngoForm.handleSubmit(onNGOSubmit)} className="space-y-6">
+                      <div>
+                        <label className={labelCls}>Organization Name</label>
+                        <input {...ngoForm.register('orgName')} className={inputCls} placeholder="HealthCare Foundation" />
+                        {ngoForm.formState.errors.orgName && <p className={errorCls}>{ngoForm.formState.errors.orgName.message as string}</p>}
                       </div>
-                      <div className="space-y-3">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Registration Number</label>
-                        <input {...ngoForm.register('regNumber')} className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-slate-900/10 transition-all font-bold text-slate-900" />
+                      <div>
+                        <label className={labelCls}>Registration Number</label>
+                        <input {...ngoForm.register('regNumber')} className={inputCls} placeholder="NGO-MH-2024-00123" />
+                        {ngoForm.formState.errors.regNumber && <p className={errorCls}>{ngoForm.formState.errors.regNumber.message as string}</p>}
                       </div>
-                      <div className="space-y-3">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Address</label>
-                        <textarea {...ngoForm.register('address')} className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-slate-900/10 transition-all font-bold text-slate-900" rows={3} />
+                      <div>
+                        <label className={labelCls}>Organization Address</label>
+                        <textarea {...ngoForm.register('address')} className={`${inputCls} resize-none`} placeholder="456 Relief Street, Pune - 411001" rows={3} />
+                        {ngoForm.formState.errors.address && <p className={errorCls}>{ngoForm.formState.errors.address.message as string}</p>}
                       </div>
-                      <button disabled={loading} type="submit" className="w-full bg-slate-900 text-white py-5 rounded-2xl font-black text-sm shadow-xl shadow-slate-900/20 hover:bg-slate-800 transition-all">
-                        {loading ? 'Uploading...' : 'Submit for Approval'}
+                      <button disabled={loading} type="submit" className="w-full bg-slate-900 text-white py-6 rounded-[24px] font-black text-lg shadow-xl shadow-slate-900/20 disabled:opacity-60 transition-all">
+                        {loading ? 'Registering...' : 'Register NGO'}
                       </button>
                     </form>
                   )}
 
+                  {/* ── PATIENT FORM ── */}
                   {role === 'patient' && (
-                    <form onSubmit={patientForm.handleSubmit(onPatientSubmit)} className="space-y-8">
-                      <div className="space-y-3">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Full Name</label>
-                        <input {...patientForm.register('name')} className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-slate-900/10 transition-all font-bold text-slate-900" placeholder="Your Name" />
+                    <form onSubmit={patientForm.handleSubmit(onPatientSubmit)} className="space-y-6">
+                      <div>
+                        <label className={labelCls}>Full Name</label>
+                        <input {...patientForm.register('name')} className={inputCls} placeholder="Rahul Sharma" />
+                        {patientForm.formState.errors.name && <p className={errorCls}>{patientForm.formState.errors.name.message as string}</p>}
                       </div>
-                      <div className="space-y-3">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">City</label>
-                        <input {...patientForm.register('city')} className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-slate-900/10 transition-all font-bold text-slate-900" placeholder="Your City" />
+                      <div>
+                        <label className={labelCls}>City</label>
+                        <input {...patientForm.register('city')} className={inputCls} placeholder="Delhi" />
+                        {patientForm.formState.errors.city && <p className={errorCls}>{patientForm.formState.errors.city.message as string}</p>}
                       </div>
-                      <button disabled={loading} type="submit" className="w-full bg-slate-900 text-white py-5 rounded-2xl font-black text-sm shadow-xl shadow-slate-900/20 hover:bg-slate-800 transition-all">
-                        {loading ? 'Registering...' : 'Complete Registration'}
+                      <button disabled={loading} type="submit" className="w-full bg-slate-900 text-white py-6 rounded-[24px] font-black text-lg shadow-xl shadow-slate-900/20 disabled:opacity-60 transition-all">
+                        {loading ? 'Joining...' : 'Join Network'}
                       </button>
                     </form>
                   )}
 
+                  {/* ── RIDER FORM ── */}
                   {role === 'rider' && (
-                    <form onSubmit={riderForm.handleSubmit(onRiderSubmit)} className="space-y-8">
-                      <div className="space-y-3">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Full Name</label>
-                        <input {...riderForm.register('name')} className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-slate-900/10 transition-all font-bold text-slate-900" placeholder="Your Name" />
+                    <form onSubmit={riderForm.handleSubmit(onRiderSubmit)} className="space-y-6">
+                      <div>
+                        <label className={labelCls}>Full Name</label>
+                        <input {...riderForm.register('name')} className={inputCls} placeholder="Arjun Patel" />
+                        {riderForm.formState.errors.name && <p className={errorCls}>{riderForm.formState.errors.name.message as string}</p>}
                       </div>
-                      <div className="space-y-3">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Vehicle Number</label>
-                        <input {...riderForm.register('vehicleNumber')} className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-slate-900/10 transition-all font-bold text-slate-900" placeholder="e.g. MH 31 AB 1234" />
+                      <div>
+                        <label className={labelCls}>Vehicle Number</label>
+                        <input {...riderForm.register('vehicleNumber')} className={inputCls} placeholder="MH-01-AB-1234" />
+                        {riderForm.formState.errors.vehicleNumber && <p className={errorCls}>{riderForm.formState.errors.vehicleNumber.message as string}</p>}
                       </div>
-                      <button disabled={loading} type="submit" className="w-full bg-slate-900 text-white py-5 rounded-2xl font-black text-sm shadow-xl shadow-slate-900/20 hover:bg-slate-800 transition-all">
-                        {loading ? 'Registering...' : 'Complete Registration'}
+                      <button disabled={loading} type="submit" className="w-full bg-slate-900 text-white py-6 rounded-[24px] font-black text-lg shadow-xl shadow-slate-900/20 disabled:opacity-60 transition-all">
+                        {loading ? 'Processing...' : 'Become a Rider'}
                       </button>
                     </form>
                   )}
 
+                  {/* ── ADMIN FORM ── */}
                   {role === 'admin' && (
-                    <form onSubmit={adminForm.handleSubmit(onAdminSubmit)} className="space-y-8">
-                      <div className="space-y-3">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Full Name</label>
-                        <input {...adminForm.register('name')} className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-slate-900/10 transition-all font-bold text-slate-900" placeholder="System Administrator Name" />
+                    <form onSubmit={adminForm.handleSubmit(onAdminSubmit)} className="space-y-6">
+                      <div>
+                        <label className={labelCls}>Admin Name</label>
+                        <input {...adminForm.register('name')} className={inputCls} placeholder="Vikram Singh" />
+                        {adminForm.formState.errors.name && <p className={errorCls}>{adminForm.formState.errors.name.message as string}</p>}
                       </div>
-                      <div className="grid grid-cols-2 gap-6">
-                        <div className="space-y-3">
-                          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Employee ID</label>
-                          <input {...adminForm.register('employeeId')} className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-slate-900/10 transition-all font-bold text-slate-900" placeholder="ADM-000" />
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className={labelCls}>Employee ID</label>
+                          <input {...adminForm.register('employeeId')} className={inputCls} placeholder="EMP-0042" />
+                          {adminForm.formState.errors.employeeId && <p className={errorCls}>{adminForm.formState.errors.employeeId.message as string}</p>}
                         </div>
-                        <div className="space-y-3">
-                          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Department</label>
-                          <input {...adminForm.register('department')} className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-slate-900/10 transition-all font-bold text-slate-900" placeholder="Operations" />
+                        <div>
+                          <label className={labelCls}>Department</label>
+                          <input {...adminForm.register('department')} className={inputCls} placeholder="Operations" />
+                          {adminForm.formState.errors.department && <p className={errorCls}>{adminForm.formState.errors.department.message as string}</p>}
                         </div>
                       </div>
-                      <button disabled={loading} type="submit" className="w-full bg-slate-900 text-white py-5 rounded-2xl font-black text-sm shadow-xl shadow-slate-900/20 hover:bg-slate-800 transition-all">
-                        {loading ? 'Initializing...' : 'Activate Admin Console'}
+                      <button disabled={loading} type="submit" className="w-full bg-slate-900 text-white py-6 rounded-[24px] font-black text-lg shadow-xl shadow-slate-900/20 disabled:opacity-60 transition-all">
+                        {loading ? 'Authorizing...' : 'Access Admin Console'}
                       </button>
                     </form>
                   )}
+
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
-
-          <footer className="mt-auto pt-20 flex items-center justify-center gap-8 opacity-30">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-900">© 2026 MedRelief Global // Institutional Access Only</p>
-          </footer>
         </main>
       </div>
     </div>
