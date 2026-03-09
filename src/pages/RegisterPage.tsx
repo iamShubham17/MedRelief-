@@ -23,7 +23,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 
 // --- Assets Import ---
-import DonorImg from '@/assets/images/donor-character.png'; 
+import DonorImg from '@/assets/images/donor-character.png';
+import BgPanelImg from '@/assets/images/img5.jpg';
 import PharmaImg from '@/assets/images/pharma-character.png';
 import NGOImg from '@/assets/images/ngo-character.png';
 import PatientImg from '@/assets/images/patient-character.png';
@@ -250,26 +251,35 @@ export function RegisterPage() {
       </AnimatePresence>
 
       {/* Left Branding Panel */}
-      <div className="hidden lg:flex lg:flex-col w-[30%] bg-white border-r border-slate-100 p-12 justify-between shrink-0">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center shadow-lg">
+      <div className="hidden lg:flex lg:flex-col w-[30%] border-r border-slate-100 p-12 justify-between shrink-0 relative overflow-hidden">
+        {/* Background Image */}
+        <img
+          src={BgPanelImg}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full object-cover object-center scale-110 pointer-events-none select-none"
+        />
+        {/* Dark Overlay */}
+        <div className="absolute inset-0 bg-slate-900/40" />
+        <div className="relative z-10 flex items-center gap-3">
+          <div className="w-10 h-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl flex items-center justify-center shadow-lg">
             <ActivityIcon className="w-6 h-6 text-white" />
           </div>
-          <span className="text-xl font-bold text-slate-900">MedRelief<span className="text-blue-500">+</span></span>
+          <span className="text-xl font-bold text-white">MedRelief<span className="text-blue-400">+</span></span>
         </div>
-        <div>
-          <h1 className="text-5xl font-black text-slate-900 tracking-tighter leading-none mb-6 italic uppercase">
-            Next Gen<br/><span className="text-slate-300">Relief.</span>
+        <div className="relative z-10">
+          <h1 className="text-5xl font-black text-white tracking-tighter leading-none mb-6 italic uppercase">
+            Next Gen<br/><span className="text-white/40">Relief.</span>
           </h1>
-          <p className="text-slate-500 font-medium leading-relaxed">
+          <p className="text-white/60 font-medium leading-relaxed">
             Secure, institutional-grade infrastructure for global medical supply chain excellence.
           </p>
         </div>
-        <div className="space-y-4">
-          <div className="flex items-center gap-3 text-slate-400 font-bold text-[10px] uppercase tracking-widest">
+        <div className="relative z-10 space-y-4">
+          <div className="flex items-center gap-3 text-white/50 font-bold text-[10px] uppercase tracking-widest">
             <Globe className="w-4 h-4"/> 24/7 Global Infrastructure
           </div>
-          <div className="flex items-center gap-3 text-slate-400 font-bold text-[10px] uppercase tracking-widest">
+          <div className="flex items-center gap-3 text-white/50 font-bold text-[10px] uppercase tracking-widest">
             <ShieldCheckIcon className="w-4 h-4"/> ISO Certified Network
           </div>
         </div>
