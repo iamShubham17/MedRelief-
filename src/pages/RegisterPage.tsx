@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { UserRole } from '@/types';
@@ -78,6 +78,13 @@ export function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [showRiderAnimation, setShowRiderAnimation] = useState(false);
   const [step, setStep] = useState(1);
+  const carouselRef = useRef<HTMLDivElement>(null);
+
+  const scrollCarousel = (dir: 'prev' | 'next') => {
+    if (!carouselRef.current) return;
+    const scrollAmount = 340;
+    carouselRef.current.scrollBy({ left: dir === 'next' ? scrollAmount : -scrollAmount, behavior: 'smooth' });
+  };
 
   const donorForm     = useForm({ resolver: zodResolver(donorSchema) });
   const pharmacistForm = useForm({ resolver: zodResolver(pharmacistSchema) });
@@ -255,7 +262,7 @@ export function RegisterPage() {
         {/* Background Image */}
         <img
           src={BgPanelImg}
-          alt=""
+          alt="background image"
           aria-hidden="true"
           className="absolute inset-0 w-full h-full object-cover object-center scale-110 pointer-events-none select-none"
         />
@@ -269,9 +276,9 @@ export function RegisterPage() {
         </div>
         <div className="relative z-10">
           <h1 className="text-5xl font-black text-white tracking-tighter leading-none mb-6 italic uppercase">
-            Next Gen<br/><span className="text-white/40">Relief.</span>
+            Next Gen<br/><span className="text-white/60">Relief.</span>
           </h1>
-          <p className="text-white/60 font-medium leading-relaxed">
+          <p className="text-white/80 font-medium leading-relaxed">
             Secure, institutional-grade infrastructure for global medical supply chain excellence.
           </p>
         </div>
@@ -308,7 +315,17 @@ export function RegisterPage() {
                 </div>
 
                 {/* Disney-style Horizontal Carousel */}
-                <div className="flex gap-10 overflow-x-auto pb-20 pt-24 no-scrollbar snap-x snap-mandatory px-4">
+                <div className="relative">
+                  {/* Prev Button */}
+                  <button
+                    onClick={() => scrollCarousel('prev')}
+                    className="absolute left-0 top-1/2 -translate-y-1/2 z-40 w-12 h-12 bg-white shadow-xl rounded-full flex items-center justify-center hover:bg-slate-100 transition-all border border-slate-100"
+                    aria-label="Previous"
+                  >
+                    <ArrowLeftIcon className="w-5 h-5 text-slate-700" />
+                  </button>
+
+                  <div ref={carouselRef} className="flex gap-10 overflow-x-auto pb-20 pt-24 no-scrollbar snap-x snap-mandatory px-16">
                   {roles.map((item) => (
                     <motion.div
                       key={item.id}
@@ -327,7 +344,7 @@ export function RegisterPage() {
                         initial={{ y: 0 }}
                         whileHover={{ y: -60, scale: 1.15 }}
                         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-                        className="absolute -top-24 left-0 right-0 mx-auto w-64 h-64 object-contain z-30 drop-shadow-[0_35px_35px_rgba(0,0,0,0.4)] pointer-events-none"
+                        className="absolute -top-24 left-0 right-0 mx-auto w-90 h-80 object-contain z-30 drop-shadow-[0_35px_35px_rgba(0,0,0,0.4)] pointer-events-none"
                       />
 
                       {/* Card Content */}
@@ -343,6 +360,16 @@ export function RegisterPage() {
                       </div>
                     </motion.div>
                   ))}
+                  </div>
+
+                  {/* Next Button */}
+                  <button
+                    onClick={() => scrollCarousel('next')}
+                    className="absolute right-0 top-1/2 -translate-y-1/2 z-40 w-12 h-12 bg-white shadow-xl rounded-full flex items-center justify-center hover:bg-slate-100 transition-all border border-slate-100"
+                    aria-label="Next"
+                  >
+                    <ArrowLeftIcon className="w-5 h-5 text-slate-700 rotate-180" />
+                  </button>
                 </div>
 
                 {/* Role Expanded Overlay */}
@@ -569,6 +596,9 @@ export function RegisterPage() {
               </motion.div>
             )}
           </AnimatePresence>
+           <footer className="mt-auto pt-20 flex items-center justify-center gap-8 opacity-80">
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-900">© 2026 MedRelief Global // Institutional Access Only</p>
+          </footer>
         </main>
       </div>
     </div>

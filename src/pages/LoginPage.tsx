@@ -13,7 +13,7 @@ import { useAuth } from '@/context/AuthContext';
 import { motion } from 'framer-motion';
 import Lottie from 'lottie-react';
 import splashAnimation from '@/assets/animations/Appointment booking with smartphone.json';
-import loginBg from '@/assets/images/Gemini_Generated_Image_9y40lp9y40lp9y40.png'; // 👈 change filename to match yours
+import loginBg from '@/assets/images/enchanted-forest-fantasy-background.jpg'; // 👈 change filename to match yours
 import { MedicalServices, ShieldCheckIcon } from '@/components/icons';
 import { Logo } from '@/components/Logo';
 
@@ -126,7 +126,7 @@ export function LoginPage() {
 
         {/* Header */}
         <header className="w-full border-b border-white/10 px-6 py-4 fixed top-0 z-50"
-          style={{ background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}
+          style={{ background: 'rgba(21, 134, 10, 0.08)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}
         >
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <Logo size="sm" />
