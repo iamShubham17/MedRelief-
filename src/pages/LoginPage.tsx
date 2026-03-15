@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  RecaptchaVerifier, 
-  signInWithPhoneNumber, 
-  GoogleAuthProvider, 
+import {
+  RecaptchaVerifier,
+  signInWithPhoneNumber,
+  GoogleAuthProvider,
   signInWithPopup,
   ConfirmationResult
 } from 'firebase/auth';
@@ -11,12 +11,53 @@ import { auth } from '@/config/firebase';
 import { dbService } from '@/services/dbService';
 import { useAuth } from '@/context/AuthContext';
 import { motion } from 'framer-motion';
-import Lottie from 'lottie-react';
-import splashAnimation from '@/assets/animations/Appointment booking with smartphone.json';
-import loginBg from '@/assets/images/enchanted-forest-fantasy-background.jpg'; // 👈 change filename to match yours
-import { MedicalServices, ShieldCheckIcon } from '@/components/icons';
+import { useRive } from '@rive-app/react-webgl2';
 import { Logo } from '@/components/Logo';
+import { ShieldCheckIcon } from '@/components/icons';
+import bgVideo from '@/assets/videos/pp.mp4';
 
+// ── Video full-screen background ─────────────────────────────────────────────
+function VideoBackground() {
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 0, overflow: 'hidden' }}>
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          display: 'block',
+        }}
+      >
+        <source src={bgVideo} type="video/mp4" />
+      </video>
+      {/* Light & clean overlay — brightens slightly, keeps card readable */}
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        background: 'rgba(255,255,255,0.18)',
+        backdropFilter: 'blur(0px)',
+      }} />
+    </div>
+  );
+}
+
+// ── Google "G" SVG icon ───────────────────────────────────────────────────────
+function GoogleIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M17.64 9.2045c0-.6381-.0573-1.2518-.1636-1.8409H9v3.4814h4.8436c-.2086 1.125-.8427 2.0782-1.7959 2.7164v2.2581h2.9087c1.7018-1.5668 2.6836-3.874 2.6836-6.615z" fill="#4285F4"/>
+      <path d="M9 18c2.43 0 4.4673-.8064 5.9564-2.1805l-2.9087-2.2581c-.8064.54-1.8368.8591-3.0477.8591-2.3445 0-4.3282-1.5832-5.036-3.7105H.9574v2.3318C2.4382 15.9832 5.4818 18 9 18z" fill="#34A853"/>
+      <path d="M3.964 10.71c-.18-.54-.2827-1.1168-.2827-1.71s.1027-1.17.2827-1.71V4.9582H.9573C.3477 6.1732 0 7.5477 0 9s.3477 2.8268.9573 4.0418L3.964 10.71z" fill="#FBBC05"/>
+      <path d="M9 3.5795c1.3214 0 2.5077.4541 3.4405 1.346l2.5813-2.5814C13.4627.8918 11.4255 0 9 0 5.4818 0 2.4382 2.0168.9573 4.9582L3.964 7.29C4.6718 5.1627 6.6555 3.5795 9 3.5795z" fill="#EA4335"/>
+    </svg>
+  );
+}
+
+// ── Main Login Page ──────────────────────────────────────────────────────────
 export function LoginPage() {
   const { refreshProfile } = useAuth();
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -25,7 +66,7 @@ export function LoginPage() {
   const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -60,8 +101,6 @@ export function LoginPage() {
       if (!confirmationResult) throw new Error('No confirmation result');
       const result = await confirmationResult.confirm(otp);
       const user = result.user;
-      
-      // Check if user exists in MongoDB
       const userProfile = await dbService.getUserProfile(user.uid);
       if (userProfile) {
         await refreshProfile();
@@ -70,7 +109,7 @@ export function LoginPage() {
         navigate('/register');
       }
     } catch (err: any) {
-      setError('Invalid OTP');
+      setError('Invalid OTP. Please try again.');
       console.error(err);
     } finally {
       setLoading(false);
@@ -90,196 +129,372 @@ export function LoginPage() {
         navigate('/register');
       }
     } catch (err: any) {
-      setError('Google Sign-In failed');
+      setError('Google Sign-In failed. Please try again.');
       console.error(err);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ position: 'relative' }}>
-      {/* ── Background Layer ── */}
-      <div
-        style={{
-          position: 'fixed',
-          inset: 0,
-          zIndex: 0,
-          backgroundImage: `url(${loginBg})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-        }}
-      />
-      {/* Overlay: soft dark-blue tint so white UI stays readable */}
-      <div
-        style={{
-          position: 'fixed',
-          inset: 0,
-          zIndex: 1,
-          background:
-            'linear-gradient(135deg, rgba(10,30,60,0.72) 0%, rgba(0,80,120,0.55) 60%, rgba(0,160,180,0.30) 100%)',
-        }}
-      />
+    <div style={{ minHeight: '100vh', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
 
-      {/* ── All page content sits above the bg ── */}
-      <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-        <div id="recaptcha-container"></div>
+      {/* ── Video Full-Screen Background ── */}
+      <VideoBackground />
 
-        {/* Header */}
-        <header className="w-full border-b border-white/10 px-6 py-4 fixed top-0 z-50"
-          style={{ background: 'rgba(21, 134, 10, 0.08)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}
+      {/* ── Recaptcha (invisible) ── */}
+      <div id="recaptcha-container" />
+
+      {/* ── Centered Card ── */}
+      <motion.div
+        initial={{ opacity: 0, y: 24, scale: 0.97 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        style={{
+          position: 'relative',
+          zIndex: 10,
+          width: '100%',
+          maxWidth: '860px',
+          background: 'rgba(255, 255, 255, 0.96)',
+          borderRadius: '24px',
+          boxShadow: '0 32px 80px rgba(0,0,0,0.18), 0 8px 32px rgba(0,0,0,0.10)',
+          border: '1px solid rgba(255,255,255,0.8)',
+          overflow: 'hidden',
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+        }}
+        className="login-card"
+      >
+
+        {/* ── LEFT PANEL: Rive animation panel ── */}
+        <div
+          style={{
+            position: 'relative',
+            minHeight: '520px',
+            overflow: 'hidden',
+            borderRadius: '20px 0 0 20px',
+            background: 'linear-gradient(160deg, #a8d8f0 0%, #c5e8f7 40%, #7ec8e3 100%)',
+          }}
+          className="left-panel"
         >
-          <div className="max-w-7xl mx-auto flex items-center justify-between">
-            <Logo size="sm" />
-            <button 
-              onClick={() => navigate('/register')}
-              className="px-6 py-2 rounded-xl font-bold text-sm transition-all"
-              style={{
-                background: 'rgba(255,255,255,0.12)',
-                color: '#fff',
-                border: '1px solid rgba(255,255,255,0.25)',
-              }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.22)')}
-              onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.12)')}
-            >
-              Register
-            </button>
+          {/* Inner Rive preview – mirrors the background but cropped to left panel */}
+          <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+            <LeftPanelRive />
           </div>
-        </header>
 
-        {/* Main */}
-        <main className="flex-grow flex items-center justify-center pt-24 pb-12 px-4">
-          <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Tagline overlay */}
+          <div
+            style={{
+              position: 'absolute',
+              bottom: '32px',
+              left: '28px',
+              zIndex: 2,
+            }}
+          >
+            <p style={{
+              fontSize: '28px',
+              fontWeight: 900,
+              color: '#fff',
+              lineHeight: 1.2,
+              textShadow: '0 2px 12px rgba(0,0,0,0.25)',
+              fontFamily: "'Montserrat', 'Arial Black', sans-serif",
+              letterSpacing: '-0.5px',
+            }}>
+              HEAL.<br />CONNECT.<br />CARE.
+            </p>
+          </div>
 
-            {/* Left Side: Animation */}
-            <motion.div 
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="hidden lg:flex flex-col items-center justify-center text-center space-y-8"
-            >
-              <div className="w-full max-w-2xl">
-                <Lottie animationData={splashAnimation} loop={true} />
-              </div>
-              <div>
-                <h2 className="text-4xl font-black mb-4 tracking-tight" style={{ color: '#fff', textShadow: '0 2px 16px rgba(0,0,0,0.3)' }}>
-                  Your Health, <span style={{ color: '#38bdf8' }}>Our Mission</span>
-                </h2>
-                <p className="font-medium max-w-sm mx-auto text-lg" style={{ color: 'rgba(255,255,255,0.75)' }}>
-                  Join our community of donors and healthcare professionals to make medicine accessible for everyone.
-                </p>
-              </div>
-            </motion.div>
+          {/* Subtle bottom gradient */}
+          <div style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: '160px',
+            background: 'linear-gradient(to top, rgba(30,80,140,0.45) 0%, transparent 100%)',
+            zIndex: 1,
+          }} />
+        </div>
 
-            {/* Right Side: Login Form */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
+        {/* ── RIGHT PANEL: Login Form ── */}
+        <div style={{ padding: '48px 44px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+
+          {/* Logo + Brand */}
+          <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+            <Logo size="sm" />
+          </div>
+
+          {/* Heading */}
+          <div style={{ marginBottom: '28px' }}>
+            <h1 style={{
+              fontSize: '26px',
+              fontWeight: 900,
+              color: '#0f172a',
+              letterSpacing: '-0.5px',
+              marginBottom: '6px',
+              fontFamily: "'Montserrat', 'Arial Black', sans-serif",
+              textTransform: 'uppercase',
+            }}>
+              {step === 'phone' ? 'Welcome Back' : 'Enter OTP'}
+            </h1>
+            <p style={{ fontSize: '13px', color: '#64748b', fontWeight: 500 }}>
+              {step === 'phone'
+                ? 'Login to your secure healthcare dashboard'
+                : `OTP sent to +91 ${phoneNumber}. Enter the 6-digit code.`}
+            </p>
+          </div>
+
+          {/* Error */}
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
-              className="w-full max-w-md mx-auto"
+              style={{
+                marginBottom: '16px',
+                padding: '12px 16px',
+                background: '#fef2f2',
+                border: '1px solid #fecaca',
+                borderRadius: '12px',
+                fontSize: '13px',
+                color: '#dc2626',
+                fontWeight: 600,
+                textAlign: 'center',
+              }}
             >
-              <div
-                className="rounded-3xl overflow-hidden"
+              {error}
+            </motion.div>
+          )}
+
+          {/* ── STEP: Phone ── */}
+          {step === 'phone' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+              {/* Phone Input */}
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#475569', marginBottom: '8px', letterSpacing: '0.05em' }}>
+                  Mobile Number
+                </label>
+                <div style={{
+                  display: 'flex',
+                  border: '1.5px solid #e2e8f0',
+                  borderRadius: '12px',
+                  overflow: 'hidden',
+                  transition: 'border-color 0.2s',
+                }}
+                  onFocusCapture={e => (e.currentTarget.style.borderColor = '#3b82f6')}
+                  onBlurCapture={e => (e.currentTarget.style.borderColor = '#e2e8f0')}
+                >
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '0 14px',
+                    background: '#f8fafc',
+                    borderRight: '1.5px solid #e2e8f0',
+                  }}>
+                    <span style={{ fontSize: '14px', fontWeight: 700, color: '#334155' }}>+91</span>
+                  </div>
+                  <input
+                    type="tel"
+                    maxLength={10}
+                    placeholder="Enter 10-digit number"
+                    value={phoneNumber}
+                    onChange={e => setPhoneNumber(e.target.value)}
+                    style={{
+                      flex: 1,
+                      padding: '14px 16px',
+                      border: 'none',
+                      outline: 'none',
+                      fontSize: '15px',
+                      fontWeight: 600,
+                      color: '#0f172a',
+                      background: 'transparent',
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Send OTP Button */}
+              <button
+                onClick={handleSendOtp}
+                disabled={loading || phoneNumber.length !== 10}
                 style={{
-                  background: 'rgba(255,255,255,0.92)',
-                  backdropFilter: 'blur(24px)',
-                  WebkitBackdropFilter: 'blur(24px)',
-                  border: '1px solid rgba(255,255,255,0.6)',
-                  boxShadow: '0 25px 60px rgba(0,30,80,0.25), 0 8px 24px rgba(0,0,0,0.12)',
+                  width: '100%',
+                  padding: '14px',
+                  background: loading || phoneNumber.length !== 10 ? '#94a3b8' : '#0f172a',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '12px',
+                  fontSize: '14px',
+                  fontWeight: 800,
+                  cursor: loading || phoneNumber.length !== 10 ? 'not-allowed' : 'pointer',
+                  letterSpacing: '0.03em',
+                  transition: 'background 0.2s, transform 0.1s',
+                  boxShadow: '0 4px 14px rgba(15,23,42,0.2)',
+                }}
+                onMouseEnter={e => { if (!loading && phoneNumber.length === 10) (e.currentTarget.style.background = '#1e293b'); }}
+                onMouseLeave={e => { if (!loading && phoneNumber.length === 10) (e.currentTarget.style.background = '#0f172a'); }}
+                onMouseDown={e => { (e.currentTarget.style.transform = 'scale(0.98)'); }}
+                onMouseUp={e => { (e.currentTarget.style.transform = 'scale(1)'); }}
+              >
+                {loading ? 'Sending OTP...' : 'Get OTP'}
+              </button>
+
+              {/* Divider */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: '4px 0' }}>
+                <div style={{ flex: 1, height: '1px', background: '#e2e8f0' }} />
+                <span style={{ fontSize: '11px', fontWeight: 700, color: '#94a3b8', letterSpacing: '0.08em', textTransform: 'uppercase' }}>or</span>
+                <div style={{ flex: 1, height: '1px', background: '#e2e8f0' }} />
+              </div>
+
+              {/* Google Sign In */}
+              <button
+                onClick={handleGoogleSignIn}
+                style={{
+                  width: '100%',
+                  padding: '13px',
+                  background: '#fff',
+                  color: '#374151',
+                  border: '1.5px solid #e2e8f0',
+                  borderRadius: '12px',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '10px',
+                  transition: 'background 0.2s, border-color 0.2s',
+                }}
+                onMouseEnter={e => { (e.currentTarget.style.background = '#f8fafc'); (e.currentTarget.style.borderColor = '#cbd5e1'); }}
+                onMouseLeave={e => { (e.currentTarget.style.background = '#fff'); (e.currentTarget.style.borderColor = '#e2e8f0'); }}
+              >
+                <GoogleIcon />
+                Sign in with Google
+              </button>
+
+              {/* Register Link */}
+              <p style={{ textAlign: 'center', fontSize: '12px', color: '#94a3b8', fontWeight: 600, marginTop: '4px' }}>
+                New to MedRelief+?{' '}
+                <button
+                  onClick={() => navigate('/register')}
+                  style={{ color: '#3b82f6', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: '12px' }}
+                >
+                  Sign up
+                </button>
+              </p>
+            </div>
+          )}
+
+          {/* ── STEP: OTP ── */}
+          {step === 'otp' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+              {/* OTP Input */}
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#475569', marginBottom: '8px', letterSpacing: '0.05em' }}>
+                  6-Digit OTP
+                </label>
+                <input
+                  type="text"
+                  maxLength={6}
+                  placeholder="000000"
+                  value={otp}
+                  onChange={e => setOtp(e.target.value.replace(/\D/g, ''))}
+                  style={{
+                    width: '100%',
+                    padding: '16px',
+                    border: '1.5px solid #e2e8f0',
+                    borderRadius: '12px',
+                    outline: 'none',
+                    fontSize: '28px',
+                    fontWeight: 900,
+                    color: '#0f172a',
+                    textAlign: 'center',
+                    letterSpacing: '0.5em',
+                    background: '#f8fafc',
+                    boxSizing: 'border-box',
+                    transition: 'border-color 0.2s',
+                  }}
+                  onFocus={e => (e.currentTarget.style.borderColor = '#3b82f6')}
+                  onBlur={e => (e.currentTarget.style.borderColor = '#e2e8f0')}
+                />
+              </div>
+
+              {/* Verify Button */}
+              <button
+                onClick={handleVerifyOtp}
+                disabled={loading || otp.length !== 6}
+                style={{
+                  width: '100%',
+                  padding: '14px',
+                  background: loading || otp.length !== 6 ? '#94a3b8' : '#0f172a',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '12px',
+                  fontSize: '14px',
+                  fontWeight: 800,
+                  cursor: loading || otp.length !== 6 ? 'not-allowed' : 'pointer',
+                  letterSpacing: '0.03em',
+                  transition: 'background 0.2s',
+                  boxShadow: '0 4px 14px rgba(15,23,42,0.2)',
                 }}
               >
-                <div className="p-10">
-                  <h2 className="text-3xl font-black text-slate-900 mb-2">Welcome back</h2>
-                  <p className="text-slate-500 font-medium text-sm mb-10">Login to your secure healthcare dashboard</p>
+                {loading ? 'Verifying...' : 'Verify & Login'}
+              </button>
 
-                  {error && (
-                    <div className="mb-6 p-4 bg-red-50 border border-red-100 text-red-600 text-sm rounded-2xl font-bold text-center">
-                      {error}
-                    </div>
-                  )}
+              {/* Back */}
+              <button
+                onClick={() => { setStep('phone'); setOtp(''); setError(''); }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  color: '#94a3b8',
+                  letterSpacing: '0.05em',
+                  textTransform: 'uppercase',
+                  textAlign: 'center',
+                  padding: '4px',
+                  transition: 'color 0.2s',
+                }}
+                onMouseEnter={e => (e.currentTarget.style.color = '#3b82f6')}
+                onMouseLeave={e => (e.currentTarget.style.color = '#94a3b8')}
+              >
+                ← Change Phone Number
+              </button>
+            </div>
+          )}
 
-                  {step === 'phone' ? (
-                    <div className="space-y-8">
-                      <div className="space-y-3">
-                        <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Mobile Number</label>
-                        <div className="flex items-center border border-slate-200 rounded-2xl overflow-hidden focus-within:ring-4 focus-within:ring-primary/10 focus-within:border-primary transition-all">
-                          <div className="flex items-center gap-2 px-4 py-4 bg-slate-50 border-r border-slate-200">
-                            <span className="text-sm font-bold text-slate-700">+91</span>
-                          </div>
-                          <input 
-                            className="flex-1 px-5 py-4 bg-transparent border-none focus:ring-0 text-slate-900 font-bold placeholder:text-slate-300" 
-                            maxLength={10} 
-                            placeholder="Enter 10-digit number" 
-                            type="tel"
-                            value={phoneNumber}
-                            onChange={(e) => setPhoneNumber(e.target.value)}
-                          />
-                        </div>
-                      </div>
-                      <button 
-                        disabled={loading || phoneNumber.length !== 10}
-                        onClick={handleSendOtp}
-                        className="w-full bg-primary text-white py-4.5 rounded-2xl font-black text-sm shadow-xl shadow-primary/25 hover:bg-primary/90 active:scale-[0.98] transition-all disabled:opacity-50"
-                      >
-                        {loading ? 'Sending...' : 'Get OTP'}
-                      </button>
-                      
-                      <div className="relative py-4">
-                        <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-slate-100"></span></div>
-                        <div className="relative flex justify-center text-[10px] font-black uppercase tracking-widest"><span className="bg-white px-4 text-slate-400">Or continue with</span></div>
-                      </div>
-
-                      <button 
-                        onClick={handleGoogleSignIn}
-                        className="w-full flex items-center justify-center gap-3 border border-slate-200 py-4.5 rounded-2xl font-bold text-sm hover:bg-slate-50 transition-all"
-                      >
-                        <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" />
-                        Google Account
-                      </button>
-
-                      <p className="text-center text-xs font-bold text-slate-400 uppercase tracking-widest mt-4">
-                        New to MedRelief+? <button onClick={() => navigate('/register')} className="text-primary hover:underline">Create an account</button>
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-8">
-                      <div className="space-y-3">
-                        <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Enter OTP</label>
-                        <input 
-                          className="w-full px-5 py-4 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-center tracking-[0.5em] text-2xl font-black text-slate-900 placeholder:text-slate-200" 
-                          maxLength={6} 
-                          placeholder="000000" 
-                          type="text"
-                          value={otp}
-                          onChange={(e) => setOtp(e.target.value)}
-                        />
-                      </div>
-                      <button 
-                        disabled={loading || otp.length !== 6}
-                        onClick={handleVerifyOtp}
-                        className="w-full bg-primary text-white py-4.5 rounded-2xl font-black text-sm shadow-xl shadow-primary/25 hover:bg-primary/90 active:scale-[0.98] transition-all disabled:opacity-50"
-                      >
-                        {loading ? 'Verifying...' : 'Verify & Login'}
-                      </button>
-                      <button 
-                        onClick={() => setStep('phone')}
-                        className="w-full text-xs font-black uppercase tracking-widest text-slate-400 hover:text-primary transition-colors"
-                      >
-                        Change Phone Number
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="mt-10 flex items-center justify-center gap-8" style={{ opacity: 0.7 }}>
-                <div className="flex items-center gap-2">
-                  <ShieldCheckIcon className="w-4 h-4" style={{ color: '#fff' }} />
-                  <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: '#fff' }}>Secured by Firebase</span>
-                </div>
-              </div>
-            </motion.div>
-
+          {/* Footer trust badge */}
+          <div style={{ marginTop: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', opacity: 0.5 }}>
+            <ShieldCheckIcon style={{ width: '14px', height: '14px', color: '#64748b' }} />
+            <span style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+              Secured by Firebase
+            </span>
           </div>
-        </main>
-      </div>
+        </div>
+      </motion.div>
+
+      {/* ── Responsive styles ── */}
+      <style>{`
+        @media (max-width: 640px) {
+          .login-card {
+            grid-template-columns: 1fr !important;
+          }
+          .left-panel {
+            display: none !important;
+          }
+        }
+      `}</style>
     </div>
   );
+}
+
+// ── Left panel inner Rive (separate instance) ────────────────────────────────
+function LeftPanelRive() {
+  const { RiveComponent } = useRive({
+    src: '/src/assets/animations/hero1.riv',
+    stateMachines: 'MainStateMachine',
+    autoplay: true,
+  });
+  return <RiveComponent style={{ width: '100%', height: '100%', display: 'block' }} />;
 }
