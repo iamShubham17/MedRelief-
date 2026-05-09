@@ -14,7 +14,7 @@ import { motion } from 'framer-motion';
 import { useRive } from '@rive-app/react-webgl2';
 import { Logo } from '@/components/Logo';
 import { ShieldCheckIcon } from '@/components/icons';
-import bgVideo from '@/assets/videos/pp.mp4';
+import bgVideo from '@/assets/videos/ms.mp4';
 
 // ── Video full-screen background ─────────────────────────────────────────────
 function VideoBackground() {
