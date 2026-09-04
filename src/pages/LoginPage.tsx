@@ -1,11 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  RecaptchaVerifier,
-  signInWithPhoneNumber,
   GoogleAuthProvider,
   signInWithPopup,
-  ConfirmationResult
 } from 'firebase/auth';
 import { auth } from '@/config/firebase';
 import { dbService } from '@/services/dbService';
@@ -60,61 +57,9 @@ function GoogleIcon() {
 // ── Main Login Page ──────────────────────────────────────────────────────────
 export function LoginPage() {
   const { refreshProfile } = useAuth();
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [otp, setOtp] = useState('');
-  const [step, setStep] = useState<'phone' | 'otp'>('phone');
-  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [error, setError] = React.useState('');
 
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!(window as any).recaptchaVerifier) {
-      (window as any).recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-        size: 'invisible',
-      });
-    }
-  }, []);
-
-  const handleSendOtp = async () => {
-    setError('');
-    setLoading(true);
-    try {
-      const formattedPhone = phoneNumber.startsWith('+') ? phoneNumber : `+91${phoneNumber}`;
-      const appVerifier = (window as any).recaptchaVerifier;
-      const result = await signInWithPhoneNumber(auth, formattedPhone, appVerifier);
-      setConfirmationResult(result);
-      setStep('otp');
-    } catch (err: any) {
-      setError(err.message || 'Failed to send OTP');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerifyOtp = async () => {
-    setError('');
-    setLoading(true);
-    try {
-      if (!confirmationResult) throw new Error('No confirmation result');
-      const result = await confirmationResult.confirm(otp);
-      const user = result.user;
-      const userProfile = await dbService.getUserProfile(user.uid);
-      if (userProfile) {
-        await refreshProfile();
-        navigate(`/dashboard/${userProfile.role}`);
-      } else {
-        navigate('/register');
-      }
-    } catch (err: any) {
-      setError('Invalid OTP. Please try again.');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleGoogleSignIn = async () => {
     const provider = new GoogleAuthProvider();
@@ -139,9 +84,6 @@ export function LoginPage() {
 
       {/* ── Video Full-Screen Background ── */}
       <VideoBackground />
-
-      {/* ── Recaptcha (invisible) ── */}
-      <div id="recaptcha-container" />
 
       {/* ── Centered Card ── */}
       <motion.div
@@ -233,12 +175,10 @@ export function LoginPage() {
               fontFamily: "'Montserrat', 'Arial Black', sans-serif",
               textTransform: 'uppercase',
             }}>
-              {step === 'phone' ? 'Welcome Back' : 'Enter OTP'}
+              Welcome Back
             </h1>
             <p style={{ fontSize: '13px', color: '#64748b', fontWeight: 500 }}>
-              {step === 'phone'
-                ? 'Login to your secure healthcare dashboard'
-                : `OTP sent to +91 ${phoneNumber}. Enter the 6-digit code.`}
+              Login to your secure healthcare dashboard
             </p>
           </div>
 
@@ -263,206 +203,44 @@ export function LoginPage() {
             </motion.div>
           )}
 
-          {/* ── STEP: Phone ── */}
-          {step === 'phone' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {/* ── Google Sign In ── */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <button
+              onClick={handleGoogleSignIn}
+              style={{
+                width: '100%',
+                padding: '13px',
+                background: '#fff',
+                color: '#374151',
+                border: '1.5px solid #e2e8f0',
+                borderRadius: '12px',
+                fontSize: '14px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px',
+                transition: 'background 0.2s, border-color 0.2s',
+              }}
+              onMouseEnter={e => { (e.currentTarget.style.background = '#f8fafc'); (e.currentTarget.style.borderColor = '#cbd5e1'); }}
+              onMouseLeave={e => { (e.currentTarget.style.background = '#fff'); (e.currentTarget.style.borderColor = '#e2e8f0'); }}
+            >
+              <GoogleIcon />
+              Sign in with Google
+            </button>
 
-              {/* Phone Input */}
-              <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#475569', marginBottom: '8px', letterSpacing: '0.05em' }}>
-                  Mobile Number
-                </label>
-                <div style={{
-                  display: 'flex',
-                  border: '1.5px solid #e2e8f0',
-                  borderRadius: '12px',
-                  overflow: 'hidden',
-                  transition: 'border-color 0.2s',
-                }}
-                  onFocusCapture={e => (e.currentTarget.style.borderColor = '#3b82f6')}
-                  onBlurCapture={e => (e.currentTarget.style.borderColor = '#e2e8f0')}
-                >
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    padding: '0 14px',
-                    background: '#f8fafc',
-                    borderRight: '1.5px solid #e2e8f0',
-                  }}>
-                    <span style={{ fontSize: '14px', fontWeight: 700, color: '#334155' }}>+91</span>
-                  </div>
-                  <input
-                    type="tel"
-                    maxLength={10}
-                    placeholder="Enter 10-digit number"
-                    value={phoneNumber}
-                    onChange={e => setPhoneNumber(e.target.value)}
-                    style={{
-                      flex: 1,
-                      padding: '14px 16px',
-                      border: 'none',
-                      outline: 'none',
-                      fontSize: '15px',
-                      fontWeight: 600,
-                      color: '#0f172a',
-                      background: 'transparent',
-                    }}
-                  />
-                </div>
-              </div>
-
-              {/* Send OTP Button */}
+            {/* Register Link */}
+            <p style={{ textAlign: 'center', fontSize: '12px', color: '#94a3b8', fontWeight: 600, marginTop: '4px' }}>
+              New to MedRelief+?{' '}
               <button
-                onClick={handleSendOtp}
-                disabled={loading || phoneNumber.length !== 10}
-                style={{
-                  width: '100%',
-                  padding: '14px',
-                  background: loading || phoneNumber.length !== 10 ? '#94a3b8' : '#0f172a',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '12px',
-                  fontSize: '14px',
-                  fontWeight: 800,
-                  cursor: loading || phoneNumber.length !== 10 ? 'not-allowed' : 'pointer',
-                  letterSpacing: '0.03em',
-                  transition: 'background 0.2s, transform 0.1s',
-                  boxShadow: '0 4px 14px rgba(15,23,42,0.2)',
-                }}
-                onMouseEnter={e => { if (!loading && phoneNumber.length === 10) (e.currentTarget.style.background = '#1e293b'); }}
-                onMouseLeave={e => { if (!loading && phoneNumber.length === 10) (e.currentTarget.style.background = '#0f172a'); }}
-                onMouseDown={e => { (e.currentTarget.style.transform = 'scale(0.98)'); }}
-                onMouseUp={e => { (e.currentTarget.style.transform = 'scale(1)'); }}
+                onClick={() => navigate('/register')}
+                style={{ color: '#3b82f6', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: '12px' }}
               >
-                {loading ? 'Sending OTP...' : 'Get OTP'}
+                Sign up
               </button>
-
-              {/* Divider */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: '4px 0' }}>
-                <div style={{ flex: 1, height: '1px', background: '#e2e8f0' }} />
-                <span style={{ fontSize: '11px', fontWeight: 700, color: '#94a3b8', letterSpacing: '0.08em', textTransform: 'uppercase' }}>or</span>
-                <div style={{ flex: 1, height: '1px', background: '#e2e8f0' }} />
-              </div>
-
-              {/* Google Sign In */}
-              <button
-                onClick={handleGoogleSignIn}
-                style={{
-                  width: '100%',
-                  padding: '13px',
-                  background: '#fff',
-                  color: '#374151',
-                  border: '1.5px solid #e2e8f0',
-                  borderRadius: '12px',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '10px',
-                  transition: 'background 0.2s, border-color 0.2s',
-                }}
-                onMouseEnter={e => { (e.currentTarget.style.background = '#f8fafc'); (e.currentTarget.style.borderColor = '#cbd5e1'); }}
-                onMouseLeave={e => { (e.currentTarget.style.background = '#fff'); (e.currentTarget.style.borderColor = '#e2e8f0'); }}
-              >
-                <GoogleIcon />
-                Sign in with Google
-              </button>
-
-              {/* Register Link */}
-              <p style={{ textAlign: 'center', fontSize: '12px', color: '#94a3b8', fontWeight: 600, marginTop: '4px' }}>
-                New to MedRelief+?{' '}
-                <button
-                  onClick={() => navigate('/register')}
-                  style={{ color: '#3b82f6', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: '12px' }}
-                >
-                  Sign up
-                </button>
-              </p>
-            </div>
-          )}
-
-          {/* ── STEP: OTP ── */}
-          {step === 'otp' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-
-              {/* OTP Input */}
-              <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#475569', marginBottom: '8px', letterSpacing: '0.05em' }}>
-                  6-Digit OTP
-                </label>
-                <input
-                  type="text"
-                  maxLength={6}
-                  placeholder="000000"
-                  value={otp}
-                  onChange={e => setOtp(e.target.value.replace(/\D/g, ''))}
-                  style={{
-                    width: '100%',
-                    padding: '16px',
-                    border: '1.5px solid #e2e8f0',
-                    borderRadius: '12px',
-                    outline: 'none',
-                    fontSize: '28px',
-                    fontWeight: 900,
-                    color: '#0f172a',
-                    textAlign: 'center',
-                    letterSpacing: '0.5em',
-                    background: '#f8fafc',
-                    boxSizing: 'border-box',
-                    transition: 'border-color 0.2s',
-                  }}
-                  onFocus={e => (e.currentTarget.style.borderColor = '#3b82f6')}
-                  onBlur={e => (e.currentTarget.style.borderColor = '#e2e8f0')}
-                />
-              </div>
-
-              {/* Verify Button */}
-              <button
-                onClick={handleVerifyOtp}
-                disabled={loading || otp.length !== 6}
-                style={{
-                  width: '100%',
-                  padding: '14px',
-                  background: loading || otp.length !== 6 ? '#94a3b8' : '#0f172a',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '12px',
-                  fontSize: '14px',
-                  fontWeight: 800,
-                  cursor: loading || otp.length !== 6 ? 'not-allowed' : 'pointer',
-                  letterSpacing: '0.03em',
-                  transition: 'background 0.2s',
-                  boxShadow: '0 4px 14px rgba(15,23,42,0.2)',
-                }}
-              >
-                {loading ? 'Verifying...' : 'Verify & Login'}
-              </button>
-
-              {/* Back */}
-              <button
-                onClick={() => { setStep('phone'); setOtp(''); setError(''); }}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: '12px',
-                  fontWeight: 700,
-                  color: '#94a3b8',
-                  letterSpacing: '0.05em',
-                  textTransform: 'uppercase',
-                  textAlign: 'center',
-                  padding: '4px',
-                  transition: 'color 0.2s',
-                }}
-                onMouseEnter={e => (e.currentTarget.style.color = '#3b82f6')}
-                onMouseLeave={e => (e.currentTarget.style.color = '#94a3b8')}
-              >
-                ← Change Phone Number
-              </button>
-            </div>
-          )}
+            </p>
+          </div>
 
           {/* Footer trust badge */}
           <div style={{ marginTop: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', opacity: 0.5 }}>
